@@ -1,0 +1,23 @@
+{
+  "name": "yueby.tools.package-importer",
+  "displayName": "Yueby Tools - Package Importer",
+  "version": "0.0.1",
+  "description": "A tool for importing packages into Unity.",
+  "author": {
+    "name": "yueby",
+    "email": "yueby_sp@qq.com"
+  },
+  "keywords": [
+    "yueby",
+    "tool",
+    "package importer",
+    "package-importer",
+    "package"
+  ],
+  "unity": "2022.3",
+  "vpmDependencies": {
+    "yueby.tools.core": ">=0.0.1"
+  },
+  "unityRelease": "22f1",
+  "dependencies": {}
+}

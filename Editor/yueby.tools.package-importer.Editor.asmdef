@@ -1,6 +1,9 @@
 {
-    "name": "VRChat.Bootstrapper.Editor",
-    "references": [],
+    "name": "yueby.tools.package-importer.Editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:8004c99c42849734bb787ffc2e996c88"
+    ],
     "includePlatforms": [
         "Editor"
     ],
