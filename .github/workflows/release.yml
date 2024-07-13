@@ -1,3 +1,5 @@
+# 修改了 35(33)行、48(46)行、65(63)行、89(87)行
+
 name: Build Release
 
 on: 
@@ -30,7 +32,7 @@ jobs:
     permissions:
       contents: write
     env:
-      packagePath: Packages/${{ vars.PACKAGE_NAME }}
+      packagePath: #Packages/${{ vars.PACKAGE_NAME }}
     if: needs.config.outputs.config_package == 'true'
     steps:
 
@@ -43,7 +45,7 @@ jobs:
         id: version
         uses: zoexx/github-action-json-file-properties@b9f36ce6ee6fe2680cd3c32b2c62e22eade7e590
         with: 
-            file_path: "${{ env.packagePath }}/package.json"
+            file_path: "package.json" #${{ env.packagePath }}/
             prop_path: "version"
     
       # Configure the Environment Variables needed for releasing the Package
@@ -60,7 +62,7 @@ jobs:
       
       # Build a list of .meta files for future use
       - name: Track Package Meta Files
-        run: find "${{ env.packagePath }}/" -name \*.meta >> metaList
+        run: find "./" -name \*.meta >> metaList
       
       # Make a UnityPackage version of the Package for release
       - name: Create UnityPackage
@@ -83,5 +85,6 @@ jobs:
           files: |
             ${{ env.zipFile }}
             ${{ env.unityPackage }}
-            ${{ env.packagePath }}/package.json
+            /package.json 
+      # ${{ env.packagePath }}
           tag_name: ${{ env.version }}
