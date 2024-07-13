@@ -1,9 +1,7 @@
 {
-    "name": "yueby.tools.package-importer.Editor",
+    "name": "yueby.tools.core.Editor",
     "rootNamespace": "",
-    "references": [
-        "GUID:8004c99c42849734bb787ffc2e996c88"
-    ],
+    "references": [],
     "includePlatforms": [
         "Editor"
     ],
