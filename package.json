@@ -1,10 +1,10 @@
 {
   "name": "yueby.tools.core",
   "displayName": "Yueby Tools - Core",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "My tools core package for Unity",
   "author": {
-    "name": "yueby",
+    "name": "Yueby",
     "email": "yueby_sp@qq.com"
   },
   "keywords": [
