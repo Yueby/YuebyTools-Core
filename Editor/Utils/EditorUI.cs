@@ -19,7 +19,6 @@ namespace Yueby.Utils
             if (EditorGUI.EndChangeCheck()) onChanged?.Invoke();
         }
 
-
         // public static GUISkin GetStyle()
         // {
         //     return AssetDatabase.LoadAssetAtPath<GUISkin>("Assets/Yueby/Utils/Style/YuebyStyle.guiskin");
@@ -270,7 +269,6 @@ namespace Yueby.Utils
             EditorGUILayout.Space(padding);
             return foldout;
         }
-
 
         public static Vector2 ScrollViewEGL(UnityAction action, Vector2 position, params GUILayoutOption[] options)
         {
@@ -830,6 +828,7 @@ namespace Yueby.Utils
         // ReSharper disable Unity.PerformanceAnalysis
         public static void VerticalEGL(UnityAction action, params GUILayoutOption[] option)
         {
+
             EditorGUILayout.BeginVertical(option);
             action?.Invoke();
             EditorGUILayout.EndVertical();
@@ -840,6 +839,7 @@ namespace Yueby.Utils
             EditorGUILayout.BeginVertical(style, option);
             action?.Invoke();
             EditorGUILayout.EndVertical();
+
         }
 
         // ReSharper disable Unity.PerformanceAnalysis
@@ -928,7 +928,6 @@ namespace Yueby.Utils
             }
         }
 
-
         public static void DrawEditorTitle(string label)
         {
             var style = (GUIStyle)EditorUtils.CloneObject(UnityEngine.GUI.skin.label);
@@ -986,7 +985,6 @@ namespace Yueby.Utils
             else
                 EditorGUILayout.Space();
         }
-
 
         public static void DrawChildElement(int type, UnityAction action)
         {

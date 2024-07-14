@@ -68,6 +68,7 @@ namespace Yueby.Utils
                 {
                     OnAdd?.Invoke(list);
                     Array.Resize(ref ElementHeights, elements.Count);
+                    GUIUtility.ExitGUI();
                 },
                 onRemoveCallback = reorderableList =>
                 {
@@ -78,6 +79,7 @@ namespace Yueby.Utils
                         reorderableList.index--;
 
                     Array.Resize(ref ElementHeights, elements.Count);
+                    GUIUtility.ExitGUI();
                 },
                 onChangedCallback = list => { OnChanged?.Invoke(list.index); },
                 elementHeightCallback = index =>
