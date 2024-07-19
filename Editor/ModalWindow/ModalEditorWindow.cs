@@ -15,23 +15,40 @@ namespace Yueby.ModalWindow
         private string _ok;
         private string _cancel;
 
-        public bool IsHideCancel => _onReturnValue == null && _onOk == null;
+        private bool IsHideCancel => _onReturnValue == null && _onOk == null;
 
-        public static ModalEditorWindow Create(IModalEditorWindowDrawer drawer, Action onOk = null, string ok = "Ok", string cancel = "Cancel", bool useInEditorWindow = true)
+        private void OnEnable()
         {
-            var window = CreateWindow<ModalEditorWindow>();
-            window.Init(drawer, onOk, ok, cancel, useInEditorWindow);
-            return window;
+            _drawer?.OnEnable();
         }
 
-        public static ModalEditorWindow CreateReturnValue(IModalEditorWindowDrawer drawer, Action<bool> result = null, string ok = "Ok", string cancel = "Cancel", bool useInEditorWindow = true)
+        private void OnDisable()
         {
-            var window = CreateWindow<ModalEditorWindow>();
-            window.InitReturnValue(drawer, result, ok, cancel, useInEditorWindow);
-            return window;
+            _drawer?.OnDisable();
         }
 
-        public void Init(IModalEditorWindowDrawer drawer, Action onOk = null, string ok = "Ok", string cancel = "Cancel", bool useInEditorWindow = true)
+        public static void Create(IModalEditorWindowDrawer drawer, Action onOk = null, string ok = "Ok", string cancel = "Cancel")
+        {
+            var window = CreateWindow<ModalEditorWindow>();
+            window.Init(drawer, onOk, ok, cancel);
+            window.ShowModalUtility();
+        }
+
+        public static void Create(IModalEditorWindowDrawer drawer, Action<bool> result, string ok = "Ok", string cancel = "Cancel")
+        {
+            var window = CreateWindow<ModalEditorWindow>();
+            window.Init(drawer, result, ok, cancel);
+            window.ShowModalUtility();
+        }
+
+        private static void CreateUtility(IModalEditorWindowDrawer drawer, Action onOk, string ok, string cancel)
+        {
+            var window = CreateWindow<ModalEditorWindow>();
+            window.Init(drawer, onOk, ok, cancel);
+            window.ShowUtility();
+        }
+
+        private void Init(IModalEditorWindowDrawer drawer, Action onOk = null, string ok = "Ok", string cancel = "Cancel")
         {
             _drawer = drawer;
             _onOk = onOk;
@@ -42,11 +59,10 @@ namespace Yueby.ModalWindow
             titleContent = new GUIContent(text: _drawer.Title);
 
             OnChangeWindowSize(this);
-
-            ShowModalUtility();
         }
 
-        public void InitReturnValue(IModalEditorWindowDrawer drawer, Action<bool> result = null, string ok = "Ok", string cancel = "Cancel", bool useInEditorWindow = true)
+
+        public void Init(IModalEditorWindowDrawer drawer, Action<bool> result, string ok = "Ok", string cancel = "Cancel")
         {
             _drawer = drawer;
             _onOk = null;
@@ -57,37 +73,35 @@ namespace Yueby.ModalWindow
             titleContent = new GUIContent(text: _drawer.Title);
 
             OnChangeWindowSize(this);
-
-            ShowModalUtility();
         }
 
-        public static void Show(IModalEditorWindowDrawer drawer, Action onOk = null, string ok = "Ok", string cancel = "Cancel", bool useInEditorWindow = true)
+        public static void Show(IModalEditorWindowDrawer drawer, Action onOk = null, string ok = "Ok", string cancel = "Cancel")
         {
-            var window = Create(drawer, onOk, ok, cancel, useInEditorWindow);
+            Create(drawer, onOk, ok, cancel);
         }
 
-        public static void ShowReturnValue(IModalEditorWindowDrawer drawer, Action<bool> result = null, string ok = "Ok", string cancel = "Cancel", bool useInEditorWindow = true)
+        public static void Show(IModalEditorWindowDrawer drawer, Action<bool> result, string ok = "Ok", string cancel = "Cancel")
         {
-            CreateReturnValue(drawer, result, ok, cancel, useInEditorWindow);
+            Create(drawer, result, ok, cancel);
         }
+
+        public static void ShowUtility(IModalEditorWindowDrawer drawer, Action onOk = null, string ok = "Ok", string cancel = "Cancel")
+        {
+            CreateUtility(drawer, onOk, ok, cancel);
+        }
+
 
         private void OnChangeWindowSize(EditorWindow window)
         {
-            var minSize = new Vector2(_drawer.Position.width, _drawer.Position.height + EditorGUIUtility.singleLineHeight + 2);
-            window.minSize = minSize;
-            window.maxSize = minSize;
-            window.position = new Rect(Screen.currentResolution.width / 2 - minSize.x / 2, Screen.currentResolution.height / 2 - minSize.y / 2, minSize.x, minSize.y);
+            var size = new Vector2(_drawer.Position.width, _drawer.Position.height + EditorGUIUtility.singleLineHeight + 2f);
+            window.minSize = size;
+            window.maxSize = size;
+            window.position = new Rect(Screen.currentResolution.width / 2f - size.x / 2f, Screen.currentResolution.height / 2f - size.y / 2f, size.x, size.y);
         }
 
-        public static void ShowTip(string tip, string title = "Tips", Action onOk = null, string ok = "Ok", string cancel = "Cancel", MessageType messageType = MessageType.Info, bool useInEditorWindow = true)
+        public static void ShowTip(string tip, string title = "Tips", Action onOk = null, string ok = "Ok", string cancel = "Cancel", MessageType messageType = MessageType.Info)
         {
-
-            Show(new TipsWindowDrawer(tip, title, messageType), onOk, ok, cancel, useInEditorWindow);
-        }
-
-        public static void ShowTipAndResult(string tip, string title = "Tips", Action<bool> onReturnValue = null, string ok = "Ok", string cancel = "Cancel", MessageType messageType = MessageType.Info, bool useInEditorWindow = true)
-        {
-            ShowReturnValue(new TipsWindowDrawer(tip, title, messageType), onReturnValue, ok, cancel, useInEditorWindow);
+            Show(new TipsWindowDrawer(tip, title, messageType), onOk, ok, cancel);
         }
 
         private void OnGUI()
@@ -100,7 +114,6 @@ namespace Yueby.ModalWindow
 
             if (GUI.Button(okRect, _ok))
             {
-
                 Close();
 
                 _onOk?.Invoke();
@@ -128,6 +141,9 @@ namespace Yueby.ModalWindow
     {
         string Title { get; }
         Rect Position { get; }
+
+        void OnEnable();
+        void OnDisable();
 
         void OnDraw();
     }

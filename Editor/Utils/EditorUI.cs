@@ -29,7 +29,7 @@ namespace Yueby.Utils
             var goodHelpBoxContent = new GUIContent
             {
                 text = text,
-                image = AssetDatabase.LoadMainAssetAtPath("Packages/com.yueby.avatartools/Editor/Assets/Sprites/ok.png") as Texture2D
+                image = AssetDatabase.LoadMainAssetAtPath("Packages/yueby.tools.avatar-tools/Editor/Assets/Sprites/ok.png") as Texture2D
             };
 
             EditorGUILayout.HelpBox(goodHelpBoxContent);
