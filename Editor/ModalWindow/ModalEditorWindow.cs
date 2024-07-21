@@ -1,8 +1,6 @@
-using UnityEditor;
 using System;
+using UnityEditor;
 using UnityEngine;
-using Yueby.Utils;
-using UnityEditor.TerrainTools;
 
 namespace Yueby.ModalWindow
 {
@@ -27,24 +25,36 @@ namespace Yueby.ModalWindow
             _drawer?.OnDisable();
         }
 
-        public static void Create(IModalEditorWindowDrawer drawer, Action onOk = null, string ok = "Ok", string cancel = "Cancel")
+        public static void Create(IModalEditorWindowDrawer drawer, Action onOk = null, string ok = "Ok", string cancel = "Cancel", bool showFocusCenter = true)
         {
+            var focusedWindowPosition = focusedWindow.position;
             var window = CreateWindow<ModalEditorWindow>();
-            window.Init(drawer, onOk, ok, cancel);
+            if (showFocusCenter)
+                window.Init(focusedWindowPosition, drawer, onOk, ok, cancel);
+            else
+                window.Init(drawer, onOk, ok, cancel);
             window.ShowModalUtility();
         }
 
-        public static void Create(IModalEditorWindowDrawer drawer, Action<bool> result, string ok = "Ok", string cancel = "Cancel")
+        public static void Create(IModalEditorWindowDrawer drawer, Action<bool> result, string ok = "Ok", string cancel = "Cancel", bool showFocusCenter = true)
         {
+            var focusedWindowPosition = focusedWindow.position;
             var window = CreateWindow<ModalEditorWindow>();
-            window.Init(drawer, result, ok, cancel);
+            if (showFocusCenter)
+                window.Init(focusedWindowPosition, drawer, result, ok, cancel);
+            else
+                window.Init(drawer, result, ok, cancel);
             window.ShowModalUtility();
         }
 
-        private static void CreateUtility(IModalEditorWindowDrawer drawer, Action onOk, string ok, string cancel)
+        private static void CreateUtility(IModalEditorWindowDrawer drawer, Action onOk, string ok, string cancel, bool showFocusCenter = true)
         {
+            var focusedWindowPosition = focusedWindow.position;
             var window = CreateWindow<ModalEditorWindow>();
-            window.Init(drawer, onOk, ok, cancel);
+            if (showFocusCenter)
+                window.Init(focusedWindowPosition, drawer, onOk, ok, cancel);
+            else
+                window.Init(drawer, onOk, ok, cancel);
             window.ShowUtility();
         }
 
@@ -75,34 +85,78 @@ namespace Yueby.ModalWindow
             OnChangeWindowSize(this);
         }
 
-        public static void Show(IModalEditorWindowDrawer drawer, Action onOk = null, string ok = "Ok", string cancel = "Cancel")
+
+        private void Init(Rect focusedWindowPosition, IModalEditorWindowDrawer drawer, Action onOk = null, string ok = "Ok", string cancel = "Cancel")
         {
-            Create(drawer, onOk, ok, cancel);
+            _drawer = drawer;
+            _onOk = onOk;
+            _onReturnValue = null;
+            _ok = ok;
+            _cancel = cancel;
+
+            titleContent = new GUIContent(text: _drawer.Title);
+
+            OnChangeWindowSize(this, focusedWindowPosition);
         }
 
-        public static void Show(IModalEditorWindowDrawer drawer, Action<bool> result, string ok = "Ok", string cancel = "Cancel")
+        public void Init(Rect focusedWindowPosition, IModalEditorWindowDrawer drawer, Action<bool> result, string ok = "Ok", string cancel = "Cancel")
         {
-            Create(drawer, result, ok, cancel);
+            _drawer = drawer;
+            _onOk = null;
+            _onReturnValue = result;
+            _ok = ok;
+            _cancel = cancel;
+
+            titleContent = new GUIContent(text: _drawer.Title);
+
+            OnChangeWindowSize(this, focusedWindowPosition);
         }
 
-        public static void ShowUtility(IModalEditorWindowDrawer drawer, Action onOk = null, string ok = "Ok", string cancel = "Cancel")
+
+        public static void Show(IModalEditorWindowDrawer drawer, Action onOk = null, string ok = "Ok", string cancel = "Cancel", bool showFocusCenter = true)
         {
-            CreateUtility(drawer, onOk, ok, cancel);
+            Create(drawer, onOk, ok, cancel, showFocusCenter);
         }
 
+        public static void Show(IModalEditorWindowDrawer drawer, Action<bool> result, string ok = "Ok", string cancel = "Cancel", bool showFocusCenter = true)
+        {
+            Create(drawer, result, ok, cancel, showFocusCenter);
+        }
+
+        public static void ShowUtility(IModalEditorWindowDrawer drawer, Action onOk = null, string ok = "Ok", string cancel = "Cancel", bool showFocusCenter = true)
+        {
+            CreateUtility(drawer, onOk, ok, cancel, showFocusCenter);
+        }
+
+        public static void ShowTip(string tip, string title = "Tips", Action onOk = null, string ok = "Ok", string cancel = "Cancel", MessageType messageType = MessageType.Info, bool showFocusCenter = true)
+        {
+            Show(new TipsWindowDrawer(tip, title, messageType), onOk, ok, cancel, showFocusCenter);
+        }
 
         private void OnChangeWindowSize(EditorWindow window)
         {
             var size = new Vector2(_drawer.Position.width, _drawer.Position.height + EditorGUIUtility.singleLineHeight + 2f);
             window.minSize = size;
             window.maxSize = size;
-            window.position = new Rect(Screen.currentResolution.width / 2f - size.x / 2f, Screen.currentResolution.height / 2f - size.y / 2f, size.x, size.y);
+
+            var rect = new Rect(Screen.currentResolution.width / 2f - size.x / 2f , Screen.currentResolution.height / 2f - size.y / 2f, size.x, size.y);
+
+            // Debug.Log(rect);
+            window.position = rect;
         }
 
-        public static void ShowTip(string tip, string title = "Tips", Action onOk = null, string ok = "Ok", string cancel = "Cancel", MessageType messageType = MessageType.Info)
+        private void OnChangeWindowSize(EditorWindow window, Rect focusedWindowPosition)
         {
-            Show(new TipsWindowDrawer(tip, title, messageType), onOk, ok, cancel);
+            var size = new Vector2(_drawer.Position.width, _drawer.Position.height + EditorGUIUtility.singleLineHeight + 2f);
+            window.minSize = size;
+            window.maxSize = size;
+
+            var rect = new Rect(focusedWindowPosition.x + focusedWindowPosition.width / 2f - size.x / 2f, focusedWindowPosition.y + focusedWindowPosition.height / 2f - size.y / 2f, size.x, size.y);
+            // Debug.Log(rect);
+
+            window.position = rect;
         }
+
 
         private void OnGUI()
         {

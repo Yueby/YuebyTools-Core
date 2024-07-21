@@ -14,7 +14,7 @@ namespace Yueby
         [MenuItem("Tools/YuebyTools/VRChat/Remove PhysBones In Scene")]
         public static void StartRemove()
         {
-            ModalEditorWindow.Show(new TipsWindowDrawer("Are you sure to remove PhysBones in scene?"), () =>
+            ModalEditorWindow.ShowTip("Are you sure to remove PhysBones in scene?", onOk: () =>
             {
                 var receivers = FindObjectsByType<VRCContactReceiver>(FindObjectsSortMode.None);
                 Debug.Log("Removing " + receivers.Length + " VRCContactReceiver components");
@@ -46,7 +46,7 @@ namespace Yueby
                 {
                     DestroyImmediate(collider, true);
                 }
-            });
+            }, showFocusCenter: false);
         }
     }
 }
