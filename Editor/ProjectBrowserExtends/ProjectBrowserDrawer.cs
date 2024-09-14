@@ -1,13 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
 using UnityEditor;
-using UnityEditor.Animations;
 using UnityEngine;
-using VRC.SDK3.Avatars.ScriptableObjects;
 using Yueby.ProjectBrowserExtends.Core;
-using Object = UnityEngine.Object;
 
 namespace Yueby.ProjectBrowserExtends
 {
@@ -16,6 +11,7 @@ namespace Yueby.ProjectBrowserExtends
     {
         private const string MENU_PATH = "Tools/YuebyTools/Project Browser Style Extends";
         private const string TAG = "EXTEND_PROJECT_WINDOW";
+        public const float RIGHT_OFFSET = 2f;
 
         private static Dictionary<string, AssetItem> _assetItems;
         private static List<ProjectBrowserDrawerListener> _drawerListeners;
@@ -30,6 +26,9 @@ namespace Yueby.ProjectBrowserExtends
             {
                 EditorApplication.projectWindowItemOnGUI -= OnProjectBrowserItemGUI;
                 EditorApplication.projectWindowItemOnGUI += OnProjectBrowserItemGUI;
+
+                EditorApplication.update -= OnUpdate;
+                EditorApplication.update += OnUpdate;
             }
         }
 
@@ -40,12 +39,16 @@ namespace Yueby.ProjectBrowserExtends
             {
                 EditorPrefs.SetString(nameof(ProjectBrowserDrawer), TAG);
                 EditorApplication.projectWindowItemOnGUI -= OnProjectBrowserItemGUI;
+                EditorApplication.update -= OnUpdate;
             }
             else
             {
                 EditorPrefs.SetString(nameof(ProjectBrowserDrawer), "");
                 EditorApplication.projectWindowItemOnGUI -= OnProjectBrowserItemGUI;
                 EditorApplication.projectWindowItemOnGUI += OnProjectBrowserItemGUI;
+
+                EditorApplication.update -= OnUpdate;
+                EditorApplication.update += OnUpdate;
             }
 
             EditorApplication.RepaintProjectWindow();
@@ -96,10 +99,11 @@ namespace Yueby.ProjectBrowserExtends
             {
                 listener?.OnDraw?.Invoke(assetItem);
             }
+            
 
             if (needRepaint && _mouseOverWindow != null)
             {
-                Debug.Log("Repaint Project Window");
+                // Debug.Log("Repaint Project Window");
                 _mouseOverWindow.Repaint();
             }
         }
@@ -131,14 +135,14 @@ namespace Yueby.ProjectBrowserExtends
                 if (listener.Id == id && listener.Hash == hash)
                 {
                     listener.Refresh(onDraw, order);
-                    Debug.Log($"Already have Drawer: ${id}, refresh it.");
+                    // Debug.Log($"Already have Drawer: ${id}, refresh it.");
                     return;
                 }
             }
 
             var drawerListener = new ProjectBrowserDrawerListener(id, hash, order, onDraw);
             _drawerListeners.Add(drawerListener);
-            Debug.Log($"Register Drawer: ${id}.");
+            // Debug.Log($"Register Drawer: ${id}.");
 
             _isDirty = true;
         }

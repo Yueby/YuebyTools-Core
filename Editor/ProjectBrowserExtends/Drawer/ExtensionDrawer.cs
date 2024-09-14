@@ -47,20 +47,17 @@ namespace Yueby.ProjectBrowserExtends.Drawer
                 var extensionContent = new GUIContent(extension);
                 var size = _style.CalcSize(extensionContent);
 
-                var labelRect = item.Rect;
-                labelRect.xMin = labelRect.xMax - size.x;
-                labelRect.height = EditorGUIUtility.singleLineHeight;
-                item.Rect.xMax -= size.x;
+                var rect = item.Rect;
+                rect.xMin = rect.xMax - size.x - ProjectBrowserDrawer.RIGHT_OFFSET;
+                rect.xMax -= ProjectBrowserDrawer.RIGHT_OFFSET;
+                rect.height = EditorGUIUtility.singleLineHeight;
 
-                var badgeRect = new Rect(
-                    labelRect.x,
-                    labelRect.y,
-                    labelRect.width,
-                    labelRect.height - 2
-                );
+                item.Rect.xMax -= size.x - ProjectBrowserDrawer.RIGHT_OFFSET;
+
+                var badgeRect = new Rect(rect.x, rect.y, rect.width, rect.height - 2);
 
                 GUI.Box(badgeRect, new GUIContent(""), "Badge");
-                EditorGUI.LabelField(labelRect, extensionContent);
+                EditorGUI.LabelField(rect, extensionContent);
             }
         }
     }

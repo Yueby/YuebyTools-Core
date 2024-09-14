@@ -24,7 +24,8 @@ namespace Yueby.ProjectBrowserExtends.Drawer
 
             float folderWidth = 24;
             Rect rect = item.Rect;
-            rect.xMin = rect.xMax - folderWidth;
+            rect.xMin = rect.xMax - folderWidth - ProjectBrowserDrawer.RIGHT_OFFSET;
+            rect.xMax -= ProjectBrowserDrawer.RIGHT_OFFSET;
             rect.height = EditorGUIUtility.singleLineHeight - 2;
             item.Rect.xMax -= folderWidth;
 

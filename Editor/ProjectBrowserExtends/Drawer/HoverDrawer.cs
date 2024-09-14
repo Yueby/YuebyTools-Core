@@ -19,7 +19,7 @@ namespace Yueby.ProjectBrowserExtends.Drawer
             if (item.IsHover && Selection.activeObject != item.Asset)
             {
                 var rect = item.OriginRect;
-                
+
                 rect.y += rect.height;
                 rect.height = 1;
                 EditorGUI.DrawRect(rect, Color.gray);
