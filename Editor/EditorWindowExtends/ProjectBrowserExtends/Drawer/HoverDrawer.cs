@@ -2,19 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
-using Yueby.ProjectBrowserExtends.Core;
+using Yueby.EditorWindowExtends.ProjectBrowserExtends.Core;
 
-namespace Yueby.ProjectBrowserExtends.Drawer
+namespace Yueby.EditorWindowExtends.ProjectBrowserExtends.Drawer
 {
-    [InitializeOnLoad]
-    public class HoverDrawer
+    public class HoverDrawer : ProjectBrowserDrawer
     {
-        static HoverDrawer()
-        {
-            ProjectBrowserDrawer.Register(nameof(HoverDrawer), OnDrawHover);
-        }
+        public override string DrawerName { get; } = "Hover Line";
 
-        private static void OnDrawHover(AssetItem item)
+        public override void OnProjectBrowserGUI(AssetItem item)
         {
             if (item.IsHover && Selection.activeObject != item.Asset)
             {
@@ -25,5 +21,7 @@ namespace Yueby.ProjectBrowserExtends.Drawer
                 EditorGUI.DrawRect(rect, Color.gray);
             }
         }
+
+    
     }
 }

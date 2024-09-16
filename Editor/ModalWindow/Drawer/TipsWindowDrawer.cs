@@ -13,7 +13,7 @@ namespace Yueby.ModalWindow
             Title = title;
 
             if (height > 0)
-                _position.height = height;
+                position.height = height;
 
             Data = tip;
         }

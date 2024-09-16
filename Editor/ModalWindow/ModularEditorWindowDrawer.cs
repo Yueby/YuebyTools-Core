@@ -8,9 +8,9 @@ namespace Yueby.ModalWindow
     {
         public virtual string Title { get; protected set; } = "Modal Editor Window";
 
-        public virtual Rect Position => _position;
+        public virtual Rect Position => position;
 
-        protected Rect _position = new(0, 0, 300, (EditorGUIUtility.singleLineHeight + 2) * 3);
+        protected Rect position = new(0, 0, 300, (EditorGUIUtility.singleLineHeight + 2) * 3);
 
         public T Data { get; protected set; }
 

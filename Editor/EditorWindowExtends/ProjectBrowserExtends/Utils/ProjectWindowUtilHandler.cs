@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using UnityEditor;
 using UnityEngine;
-namespace Yueby.ProjectBrowserExtends
+namespace Yueby.EditorWindowExtends.ProjectBrowserExtends
 {
     public static class ProjectWindowUtilHandler
     {
@@ -14,7 +14,7 @@ namespace Yueby.ProjectBrowserExtends
         {
             get
             {
-                if (_createFolderWithTemplatesMethod == null) _createFolderWithTemplatesMethod = Type.GetMethod("CreateFolderWithTemplates", ReflectionHandler.StaticLookup, null, new[] { typeof(string), typeof(string[]) }, null);
+                if (_createFolderWithTemplatesMethod == null) _createFolderWithTemplatesMethod = Type.GetMethod("CreateFolderWithTemplates", ReflectionHelper.StaticLookup, null, new[] { typeof(string), typeof(string[]) }, null);
                 return _createFolderWithTemplatesMethod;
             }
         }

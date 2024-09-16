@@ -4,28 +4,24 @@ using System.Linq;
 using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
-using Yueby.ProjectBrowserExtends.Core;
+using Yueby.EditorWindowExtends.ProjectBrowserExtends.Core;
 using Object = UnityEngine.Object;
 
-namespace Yueby.ProjectBrowserExtends.Drawer
+namespace Yueby.EditorWindowExtends.ProjectBrowserExtends.Drawer
 {
-    [InitializeOnLoad]
-    public class CreateFolderDrawer
+    public class CreateFolderDrawer : ProjectBrowserDrawer
     {
-        static CreateFolderDrawer()
-        {
-            ProjectBrowserDrawer.Register(nameof(CreateFolderDrawer), OnDrawCreateFolder);
-        }
+        public override string DrawerName => "Create Folder Button";
 
-        public static void OnDrawCreateFolder(AssetItem item)
+        public override void OnProjectBrowserGUI(AssetItem item)
         {
             if (!item.IsFolder || !item.IsHover)
                 return;
 
-            float folderWidth = 24;
-            Rect rect = item.Rect;
-            rect.xMin = rect.xMax - folderWidth - ProjectBrowserDrawer.RIGHT_OFFSET;
-            rect.xMax -= ProjectBrowserDrawer.RIGHT_OFFSET;
+            const int folderWidth = 24;
+            var rect = item.Rect;
+            rect.xMin = rect.xMax - folderWidth - ProjectBrowserExtender.RightOffset;
+            rect.xMax -= ProjectBrowserExtender.RightOffset;
             rect.height = EditorGUIUtility.singleLineHeight - 2;
             item.Rect.xMax -= folderWidth;
 
@@ -41,6 +37,7 @@ namespace Yueby.ProjectBrowserExtends.Drawer
 
             EditorGUIUtility.SetIconSize(iconSize);
         }
+
 
         private static void CreateFolder(Object asset, string defaultFolderName = "New Folder")
         {

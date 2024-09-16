@@ -5,7 +5,7 @@ using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace Yueby.ProjectBrowserExtends.Core
+namespace Yueby.EditorWindowExtends.ProjectBrowserExtends.Core
 {
     public class AssetItem
     {

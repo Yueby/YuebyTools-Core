@@ -828,7 +828,6 @@ namespace Yueby.Utils
         // ReSharper disable Unity.PerformanceAnalysis
         public static void VerticalEGL(UnityAction action, params GUILayoutOption[] option)
         {
-
             EditorGUILayout.BeginVertical(option);
             action?.Invoke();
             EditorGUILayout.EndVertical();
@@ -839,7 +838,6 @@ namespace Yueby.Utils
             EditorGUILayout.BeginVertical(style, option);
             action?.Invoke();
             EditorGUILayout.EndVertical();
-
         }
 
         // ReSharper disable Unity.PerformanceAnalysis
@@ -928,16 +926,16 @@ namespace Yueby.Utils
             }
         }
 
-        public static void DrawEditorTitle(string label)
+        public static void DrawEditorTitle(string label, int fontSize = 20, float topDownMargin = 10)
         {
-            var style = (GUIStyle)EditorUtils.CloneObject(UnityEngine.GUI.skin.label);
+            var style = (GUIStyle)EditorUtils.CloneObject(GUI.skin.label);
 
             SpaceArea(() =>
             {
-                style.fontSize = 20;
+                style.fontSize = fontSize;
                 style.fontStyle = FontStyle.Bold;
                 style.alignment = TextAnchor.MiddleCenter;
-                EditorGUILayout.LabelField(label, style, GUILayout.Height(25));
+                EditorGUILayout.LabelField(label, style, GUILayout.Height(style.fontSize));
 
                 // style.fontStyle = FontStyle.Normal;
                 // style.fontSize = 12;
@@ -948,7 +946,7 @@ namespace Yueby.Utils
                 // rect.y += EditorGUIUtility.singleLineHeight;
 
                 // EditorGUI.LabelField(rect, version, style);
-            }, true, 10);
+            }, true, topDownMargin);
         }
 
         public static void TitleLabelField(string label, params GUILayoutOption[] options)

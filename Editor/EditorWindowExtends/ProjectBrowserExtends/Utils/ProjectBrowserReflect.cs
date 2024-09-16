@@ -5,9 +5,9 @@ using System.Reflection;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 using Object = UnityEngine.Object;
-namespace Yueby.ProjectBrowserExtends
+namespace Yueby.EditorWindowExtends.ProjectBrowserExtends
 {
-    public static class ProjectBrowserHandler
+    public static class ProjectBrowserReflect
     {
         private static Type _type;
         private static FieldInfo _assetTreeStateField;
@@ -18,7 +18,7 @@ namespace Yueby.ProjectBrowserExtends
         {
             get
             {
-                if (_type == null) _type = ReflectionHandler.GetEditorType("ProjectBrowser");
+                if (_type == null) _type = ReflectionHelper.GetEditorType("ProjectBrowser");
                 return _type;
             }
         }
@@ -27,7 +27,7 @@ namespace Yueby.ProjectBrowserExtends
         {
             get
             {
-                if (_assetTreeStateField == null) _assetTreeStateField = Type.GetField("m_AssetTreeState", ReflectionHandler.InstanceLookup);
+                if (_assetTreeStateField == null) _assetTreeStateField = Type.GetField("m_AssetTreeState", ReflectionHelper.InstanceLookup);
                 return _assetTreeStateField;
             }
         }
@@ -36,7 +36,7 @@ namespace Yueby.ProjectBrowserExtends
         {
             get
             {
-                if (_folderTreeStateField == null) _folderTreeStateField = Type.GetField("m_FolderTreeState", ReflectionHandler.InstanceLookup);
+                if (_folderTreeStateField == null) _folderTreeStateField = Type.GetField("m_FolderTreeState", ReflectionHelper.InstanceLookup);
                 return _folderTreeStateField;
             }
         }
@@ -45,7 +45,7 @@ namespace Yueby.ProjectBrowserExtends
         {
             get
             {
-                if (_isTwoColumnsMethod == null) _isTwoColumnsMethod = Type.GetMethod("IsTwoColumns", ReflectionHandler.InstanceLookup);
+                if (_isTwoColumnsMethod == null) _isTwoColumnsMethod = Type.GetMethod("IsTwoColumns", ReflectionHelper.InstanceLookup);
                 return _isTwoColumnsMethod;
             }
         }
