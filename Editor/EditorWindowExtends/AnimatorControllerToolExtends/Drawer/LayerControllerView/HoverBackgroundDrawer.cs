@@ -1,5 +1,4 @@
-﻿using UnityEditorInternal;
-using UnityEngine;
+﻿using UnityEngine;
 using Yueby.EditorWindowExtends.AnimatorControllerToolExtends.Core;
 
 namespace Yueby.EditorWindowExtends.AnimatorControllerToolExtends.Drawer.LayerControllerView

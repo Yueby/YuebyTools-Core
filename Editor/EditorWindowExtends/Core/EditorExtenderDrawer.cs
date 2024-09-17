@@ -1,6 +1,4 @@
-﻿using System;
-using UnityEditor;
-using Yueby.EditorWindowExtends.AnimatorControllerToolExtends.Core;
+﻿using UnityEditor;
 
 namespace Yueby.EditorWindowExtends.Core
 {

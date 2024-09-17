@@ -1,5 +1,4 @@
-﻿using UnityEditor;
-using Yueby.EditorWindowExtends.Core;
+﻿using Yueby.EditorWindowExtends.Core;
 
 namespace Yueby.EditorWindowExtends.ProjectBrowserExtends.Core
 {

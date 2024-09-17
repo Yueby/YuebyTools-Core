@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using Yueby.EditorWindowExtends.ProjectBrowserExtends.Core;
@@ -8,7 +6,7 @@ namespace Yueby.EditorWindowExtends.ProjectBrowserExtends.Drawer
 {
     public class HoverDrawer : ProjectBrowserDrawer
     {
-        public override string DrawerName { get; } = "Hover Line";
+        public override string DrawerName => "Hover Line";
 
         public override void OnProjectBrowserGUI(AssetItem item)
         {

@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
@@ -13,7 +11,7 @@ namespace Yueby.EditorWindowExtends.ProjectBrowserExtends.Core
         public Rect OriginRect;
 
         public string Guid { get; private set; }
-        public string Path { get; private set; }
+        public string Path { get; }
 
         public bool IsFolder { get; private set; }
         public bool IsHover { get; private set; }

@@ -1,5 +1,4 @@
 ﻿using UnityEditor;
-using UnityEditorInternal;
 using UnityEngine;
 using Yueby.EditorWindowExtends.AnimatorControllerToolExtends.Core;
 using AnimatorControllerLayer = UnityEditor.Animations.AnimatorControllerLayer;

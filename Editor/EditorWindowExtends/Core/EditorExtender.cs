@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEditor;
-using Yueby.EditorWindowExtends.ProjectBrowserExtends.Core;
 using Yueby.EditorWindowExtends.ProjectBrowserExtends.ModalWindow;
 using Yueby.ModalWindow;
 

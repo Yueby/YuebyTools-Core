@@ -1,21 +1,16 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using UnityEditor;
 using UnityEngine;
-using Yueby.EditorWindowExtends.AnimatorControllerToolExtends.Core;
 using Yueby.EditorWindowExtends.Core;
 using Yueby.EditorWindowExtends.ProjectBrowserExtends.Core;
-using Yueby.EditorWindowExtends.ProjectBrowserExtends.ModalWindow;
-using Yueby.ModalWindow;
 
 namespace Yueby.EditorWindowExtends.ProjectBrowserExtends
 {
     [InitializeOnLoad]
     public sealed class ProjectBrowserExtender : EditorExtender<ProjectBrowserDrawer>
     {
-        private const string MenuPath = BaseMenuPath + nameof(ProjectBrowserDrawer);
+        private const string MenuPath = BaseMenuPath + nameof(ProjectBrowserExtender);
         public const float RightOffset = 2f;
         private Dictionary<string, AssetItem> _assetItems;
 
