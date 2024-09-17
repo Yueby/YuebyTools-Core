@@ -7,12 +7,12 @@ using Yueby.ModalWindow;
 
 namespace Yueby.EditorWindowExtends.Core
 {
-    public class EditorExtender<T> where T : EditorExtenderDrawer
+    public class EditorExtender<TExtender, TDrawer> where TExtender : EditorExtender<TExtender, TDrawer>, new() where TDrawer : EditorExtenderDrawer<TExtender, TDrawer>, new()
     {
         public const string BaseMenuPath = "Tools/YuebyTools/Editor Window Extends/";
         protected string FullName => GetType().FullName;
-        protected readonly List<T> Drawers = new();
-        protected readonly ExtenderOptionModalWindowDrawer<T> OptionModalDrawer;
+        protected readonly List<TDrawer> Drawers = new();
+        protected readonly ExtenderOptionModalWindowDrawer<TExtender, TDrawer> OptionModalDrawer;
 
         public bool IsEnable
         {
@@ -20,35 +20,29 @@ namespace Yueby.EditorWindowExtends.Core
             protected set => EditorPrefs.SetBool($"{FullName}.IsEnable", value);
         }
 
-        protected EditorExtender()
+        protected EditorExtender() // 注意构造函数名称
         {
             foreach (var drawerType in GetAllDrawerTypes())
             {
-                var drawer = (T)Activator.CreateInstance(drawerType);
+                var drawer = (TDrawer)Activator.CreateInstance(drawerType);
+
+                // 强制转换 this 为 TExtender
+                drawer?.Init((TExtender)this);
 
                 Drawers.Add(drawer);
             }
 
-
-            Drawers.Sort((a, b) =>
-            {
-                if (a.Order == b.Order)
-                    return 0;
-                if (a.Order > b.Order)
-                    return 1;
-                return -1;
-            });
-
-            OptionModalDrawer = new ExtenderOptionModalWindowDrawer<T>(Drawers, this);
+            Drawers.Sort((a, b) => a.Order.CompareTo(b.Order));
+            OptionModalDrawer = new ExtenderOptionModalWindowDrawer<TExtender, TDrawer>(Drawers, this);
         }
+
 
         private IEnumerable<Type> GetAllDrawerTypes()
         {
-            // Get all classes that inherit from ProjectViewDetailBase:
             var types = Assembly.GetExecutingAssembly().GetTypes();
             foreach (var type in types)
             {
-                if (type.BaseType == typeof(T))
+                if (type.BaseType == typeof(TDrawer))
                 {
                     yield return type;
                 }

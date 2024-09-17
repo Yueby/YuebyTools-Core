@@ -8,7 +8,7 @@ using Yueby.EditorWindowExtends.ProjectBrowserExtends.Core;
 namespace Yueby.EditorWindowExtends.ProjectBrowserExtends
 {
     [InitializeOnLoad]
-    public sealed class ProjectBrowserExtender : EditorExtender<ProjectBrowserDrawer>
+    public sealed class ProjectBrowserExtender : EditorExtender<ProjectBrowserExtender,ProjectBrowserDrawer>
     {
         private const string MenuPath = BaseMenuPath + nameof(ProjectBrowserExtender);
         public const float RightOffset = 2f;

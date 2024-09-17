@@ -1,7 +1,7 @@
 {
   "name": "yueby.tools.core",
   "displayName": "Yueby Tools - Core",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "description": "My tools core package for Unity",
   "author": {
     "name": "Yueby",

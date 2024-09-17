@@ -9,16 +9,17 @@ using Yueby.EditorWindowExtends.Core;
 namespace Yueby.EditorWindowExtends.AnimatorControllerToolExtends
 {
     [InitializeOnLoad]
-    public class LayerControllerViewExtender : EditorExtender<LayerControllerViewDrawer>
+    public class LayerControllerViewExtender : EditorExtender<LayerControllerViewExtender, LayerControllerViewDrawer>
     {
         private const string MenuPath = BaseMenuPath + "Animator/" + nameof(LayerControllerViewExtender);
-        private static LayerControllerViewExtender Extender;
+        private static LayerControllerViewExtender _extender;
 
         private EditorWindow _animatorControllerToolWindow;
         private int _lastIndex = -1;
         public bool IsFocusedOnWindow => EditorWindow.focusedWindow == AnimatorWindow;
+        public Vector2 ScrollPosition { get; private set; }
 
-        private EditorWindow AnimatorWindow
+        public EditorWindow AnimatorWindow
         {
             get
             {
@@ -41,7 +42,7 @@ namespace Yueby.EditorWindowExtends.AnimatorControllerToolExtends
 
         private static void OnUpdate()
         {
-            Extender = new LayerControllerViewExtender();
+            _extender = new LayerControllerViewExtender();
             EditorApplication.update -= OnUpdate;
         }
 
@@ -64,13 +65,15 @@ namespace Yueby.EditorWindowExtends.AnimatorControllerToolExtends
 
             foreach (var drawer in Drawers)
             {
-                drawer.Init(layerList, this);
+                drawer.Init(this, layerList);
             }
         }
 
         private void OnDrawElement(Rect rect, int index, bool isactive, bool isfocused)
         {
             if (!IsEnable) return;
+
+            ScrollPosition = LayerControllerViewReflect.GetLayerScrollPosition(AnimatorWindow);
 
             foreach (var drawer in Drawers.Where(drawer => drawer.IsVisible))
             {
@@ -162,7 +165,7 @@ namespace Yueby.EditorWindowExtends.AnimatorControllerToolExtends
         [MenuItem(MenuPath, false)]
         private static void ShowOptionWindow()
         {
-            Extender.ShowOptions();
+            _extender.ShowOptions();
         }
     }
 }

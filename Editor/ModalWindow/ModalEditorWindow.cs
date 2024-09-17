@@ -241,26 +241,17 @@ namespace Yueby.ModalWindow
 
         private void OnGUI()
         {
+            if (_drawer == null)
+            {
+                Close();
+                return;
+            }
+
             _drawer.OnDraw();
 
-            var bottomRect = new Rect(
-                0,
-                position.height - EditorGUIUtility.singleLineHeight,
-                position.width,
-                EditorGUIUtility.singleLineHeight
-            );
-            var okRect = new Rect(
-                bottomRect.x,
-                bottomRect.y,
-                IsHideCancel ? bottomRect.width : bottomRect.width / 2,
-                bottomRect.height
-            );
-            var cancelRect = new Rect(
-                okRect.x + okRect.width,
-                bottomRect.y,
-                bottomRect.width / 2,
-                bottomRect.height
-            );
+            var bottomRect = new Rect(0, position.height - EditorGUIUtility.singleLineHeight, position.width, EditorGUIUtility.singleLineHeight);
+            var okRect = new Rect(bottomRect.x, bottomRect.y, IsHideCancel ? bottomRect.width : bottomRect.width / 2, bottomRect.height);
+            var cancelRect = new Rect(okRect.x + okRect.width, bottomRect.y, bottomRect.width / 2, bottomRect.height);
 
             if (GUI.Button(okRect, _ok))
             {

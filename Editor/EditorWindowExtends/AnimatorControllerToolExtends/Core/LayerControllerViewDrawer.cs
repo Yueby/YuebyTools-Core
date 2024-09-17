@@ -4,15 +4,15 @@ using Yueby.EditorWindowExtends.Core;
 
 namespace Yueby.EditorWindowExtends.AnimatorControllerToolExtends.Core
 {
-    public class LayerControllerViewDrawer : EditorExtenderDrawer
+    public class LayerControllerViewDrawer : EditorExtenderDrawer<LayerControllerViewExtender, LayerControllerViewDrawer>
     {
         public ReorderableList ReorderableList { get; private set; }
-        public LayerControllerViewExtender Extender { get; private set; }
 
-        public virtual void Init(ReorderableList reorderableList, LayerControllerViewExtender editorWindowExtender)
+
+        public virtual void Init(LayerControllerViewExtender extender, ReorderableList reorderableList)
         {
+            base.Init(extender);
             ReorderableList = reorderableList;
-            Extender = editorWindowExtender;
         }
 
         public virtual void OnDrawElement(Rect rect, int index, bool isactive, bool isfocused)
