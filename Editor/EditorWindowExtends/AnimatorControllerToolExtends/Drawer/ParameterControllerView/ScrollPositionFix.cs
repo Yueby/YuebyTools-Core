@@ -1,17 +1,18 @@
 ﻿using UnityEditorInternal;
 using UnityEngine;
 using Yueby.EditorWindowExtends.AnimatorControllerToolExtends.Core;
+using Yueby.EditorWindowExtends.AnimatorControllerToolExtends.Reflections;
 
-namespace Yueby.EditorWindowExtends.AnimatorControllerToolExtends.Drawer.LayerControllerView
+namespace Yueby.EditorWindowExtends.AnimatorControllerToolExtends.Drawer.ParameterControllerView
 {
-    public class ScrollPositionFix : LayerControllerViewDrawer
+    public class ScrollPositionFix : ParameterControllerViewDrawer
     {
         public override string DrawerName => "Scroll Position Fix";
-        public override string ToolTip => "Fix layer delete and add scroll position";
+        public override string ToolTip => "Fix parameter delete and add scroll position";
         private Vector2 _scrollPosition;
         private int _lastCount = 0;
 
-        public override void Init(LayerControllerViewExtender extender, ReorderableList reorderableList)
+        public override void Init(ParameterControllerViewExtender extender, ReorderableList reorderableList)
         {
             base.Init(extender, reorderableList);
             _scrollPosition = Vector2.zero;
@@ -33,7 +34,7 @@ namespace Yueby.EditorWindowExtends.AnimatorControllerToolExtends.Drawer.LayerCo
                     _scrollPosition.y = y;
                 }
 
-                LayerControllerViewReflect.SetLayerScrollPosition(AnimatorControllerToolHelper.Window, _scrollPosition);
+                ParameterControllerViewReflect.SetParameterScrollPosition(AnimatorControllerToolHelper.Window, _scrollPosition);
 
                 _lastCount = ReorderableList.list.Count;
             }

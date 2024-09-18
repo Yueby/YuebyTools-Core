@@ -40,7 +40,7 @@ namespace Yueby.EditorWindowExtends.ProjectBrowserExtends.ModalWindow
 
             item.ChangeVisible(EditorGUI.Toggle(toggleRect, item.IsVisible));
 
-            EditorGUI.LabelField(labelRect, item.DrawerName);
+            EditorGUI.LabelField(labelRect, new GUIContent(item.DrawerName, item.ToolTip));
             return singleLineHeight;
         }
 

@@ -7,9 +7,11 @@ namespace Yueby.EditorWindowExtends
     {
         public const BindingFlags InstanceLookup = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
         public const BindingFlags StaticLookup = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static;
+        public const BindingFlags AllLookup = InstanceLookup | StaticLookup;
         private static Assembly _editorAssembly;
 
         private static Assembly _editorGraphsAssembly;
+        private static Assembly _editorCoreModuleAssembly;
 
         public static Assembly EditorAssembly
         {
@@ -29,6 +31,15 @@ namespace Yueby.EditorWindowExtends
             }
         }
 
+        public static Assembly EditorCoreModuleAssembly
+        {
+            get
+            {
+                if (_editorCoreModuleAssembly == null) _editorCoreModuleAssembly = Assembly.Load("UnityEditor.CoreModule");
+                return _editorCoreModuleAssembly;
+            }
+        }
+
         public static Type GetEditorType(string name, string @namespace = "UnityEditor")
         {
             var typeName = @namespace + "." + name;
@@ -39,6 +50,12 @@ namespace Yueby.EditorWindowExtends
         {
             var typeName = @namespace + "." + name;
             return EditorGraphsAssembly.GetType(typeName);
+        }
+
+        public static Type GetEditorCoreModuleType(string name, string @namespace = "UnityEditor")
+        {
+            var typeName = @namespace + "." + name;
+            return EditorCoreModuleAssembly.GetType(typeName);
         }
     }
 }

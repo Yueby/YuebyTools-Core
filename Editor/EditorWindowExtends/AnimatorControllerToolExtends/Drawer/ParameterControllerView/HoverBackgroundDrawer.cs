@@ -4,15 +4,13 @@ using Yueby.EditorWindowExtends.AnimatorControllerToolExtends.Core;
 using Yueby.EditorWindowExtends.Reflections;
 using Yueby.EditorWindowExtends.Utils;
 
-namespace Yueby.EditorWindowExtends.AnimatorControllerToolExtends.Drawer.LayerControllerView
+namespace Yueby.EditorWindowExtends.AnimatorControllerToolExtends.Drawer.ParameterControllerView
 {
-    public class HoverBackgroundDrawer : LayerControllerViewDrawer
+    public class HoverBackgroundDrawer : ParameterControllerViewDrawer
     {
         public override string DrawerName => "Hover Background";
-        // public static GUIStyle hoveredItemBackgroundStyle = (GUIStyle) "WhiteBackground";
-        // public static Color hoveredBackgroundColor = EditorResources.Load("game-object-tree-view").GetColor("-unity-object-tree-hovered-color");
 
-        public override void Init(LayerControllerViewExtender extender, ReorderableList reorderableList)
+        public override void Init(ParameterControllerViewExtender extender, ReorderableList reorderableList)
         {
             base.Init(extender, reorderableList);
         }

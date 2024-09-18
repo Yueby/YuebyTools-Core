@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Reflection;
-using Object = System.Object;
 
 namespace Yueby.EditorWindowExtends.AnimatorControllerToolExtends.Reflections
 {
@@ -11,5 +10,6 @@ namespace Yueby.EditorWindowExtends.AnimatorControllerToolExtends.Reflections
         public static Type AnimatorWindowType => _animatorWindowType ??= ReflectionHelper.GetEditorGraphsType("AnimatorControllerTool");
 
         public static FieldInfo LayerEditor => AnimatorWindowType.GetField("m_LayerEditor", ReflectionHelper.InstanceLookup);
+        public static FieldInfo ParameterEditor => AnimatorWindowType.GetField("m_ParameterEditor", ReflectionHelper.InstanceLookup);
     }
 }

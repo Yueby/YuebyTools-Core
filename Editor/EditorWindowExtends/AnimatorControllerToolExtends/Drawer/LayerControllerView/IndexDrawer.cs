@@ -34,10 +34,6 @@ namespace Yueby.EditorWindowExtends.AnimatorControllerToolExtends.Drawer.LayerCo
             {
                 richText = true,
                 alignment = TextAnchor.MiddleLeft,
-                normal =
-                {
-                    textColor = Color.white
-                }
             };
 
 

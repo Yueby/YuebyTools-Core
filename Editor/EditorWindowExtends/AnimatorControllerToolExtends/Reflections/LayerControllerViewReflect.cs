@@ -8,11 +8,11 @@ using Object = System.Object;
 
 public static class LayerControllerViewReflect
 {
-    private static Type _layerControllerViewType;
-    public static Type LayerControllerViewType => _layerControllerViewType ??= ReflectionHelper.GetEditorGraphsType("LayerControllerView");
+    private static Type _type;
+    public static Type Type => _type ??= ReflectionHelper.GetEditorGraphsType("LayerControllerView");
 
-    public static FieldInfo LayerList => LayerControllerViewType.GetField("m_LayerList", ReflectionHelper.InstanceLookup);
-    public static FieldInfo LayerScroll => LayerControllerViewType.GetField("m_LayerScroll", ReflectionHelper.InstanceLookup);
+    public static FieldInfo LayerList => Type.GetField("m_LayerList", ReflectionHelper.InstanceLookup);
+    public static FieldInfo LayerScroll => Type.GetField("m_LayerScroll", ReflectionHelper.InstanceLookup);
 
 
     public static ReorderableList GetLayerReorderableList(Object animatorWindow)

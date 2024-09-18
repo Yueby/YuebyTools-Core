@@ -1,25 +1,25 @@
 ﻿using System.Linq;
 using UnityEditor;
-using UnityEngine;
 using UnityEditorInternal;
+using UnityEngine;
 using Yueby.EditorWindowExtends.AnimatorControllerToolExtends.Core;
+using Yueby.EditorWindowExtends.AnimatorControllerToolExtends.Reflections;
 using Yueby.EditorWindowExtends.Core;
 
 namespace Yueby.EditorWindowExtends.AnimatorControllerToolExtends
 {
     [InitializeOnLoad]
-    public class LayerControllerViewExtender : EditorExtender<LayerControllerViewExtender, LayerControllerViewDrawer>
+    public class ParameterControllerViewExtender : EditorExtender<ParameterControllerViewExtender, ParameterControllerViewDrawer>
     {
-        private const string MenuPath = BaseMenuPath + "Animator/" + nameof(LayerControllerViewExtender);
-        private static LayerControllerViewExtender _extender;
+        private const string MenuPath = BaseMenuPath + "Animator/" + nameof(ParameterControllerViewExtender);
+        private static ParameterControllerViewExtender _extender;
         private static ReorderableList _lastList;
-
 
         private int _lastIndex = -1;
         public Vector2 ScrollPosition { get; private set; }
 
 
-        static LayerControllerViewExtender()
+        static ParameterControllerViewExtender()
         {
             AnimatorControllerToolHelper.OnAnimatorControllerToolState += OnAnimatorControllerToolState;
         }
@@ -28,9 +28,9 @@ namespace Yueby.EditorWindowExtends.AnimatorControllerToolExtends
         {
             if (state)
             {
-                // if (_lastList != ParameterControllerViewReflect.GetParameterReorderableList(AnimatorControllerToolHelper.Window))
-                //     _extender = null;
-                _extender ??= new LayerControllerViewExtender();
+                if (_lastList != ParameterControllerViewReflect.GetParameterReorderableList(AnimatorControllerToolHelper.Window))
+                    _extender = null;
+                _extender ??= new ParameterControllerViewExtender();
             }
             else
             {
@@ -38,14 +38,14 @@ namespace Yueby.EditorWindowExtends.AnimatorControllerToolExtends
             }
         }
 
-        public LayerControllerViewExtender()
+        public ParameterControllerViewExtender()
         {
             if (AnimatorControllerToolHelper.Window == null) return;
 
-            _lastList = LayerControllerViewReflect.GetLayerReorderableList(AnimatorControllerToolHelper.Window);
+            _lastList = ParameterControllerViewReflect.GetParameterReorderableList(AnimatorControllerToolHelper.Window);
             if (_lastList == null)
             {
-                Debug.LogWarning("Can't find layer list, try recreate extender.");
+                Debug.LogWarning("Can't find parameter list, try recreate extender.");
                 _extender = null;
                 return;
             }
@@ -71,7 +71,7 @@ namespace Yueby.EditorWindowExtends.AnimatorControllerToolExtends
         {
             if (!IsEnable) return;
 
-            ScrollPosition = LayerControllerViewReflect.GetLayerScrollPosition(AnimatorControllerToolHelper.Window);
+            ScrollPosition = ParameterControllerViewReflect.GetParameterScrollPosition(AnimatorControllerToolHelper.Window);
 
             foreach (var drawer in Drawers.Where(drawer => drawer.IsVisible))
             {
@@ -80,7 +80,8 @@ namespace Yueby.EditorWindowExtends.AnimatorControllerToolExtends
 
             if (_lastIndex == index) return;
             _lastIndex = index;
-            AnimatorControllerToolHelper.Window.Repaint();
+
+            Repaint();
         }
 
         private void OnDrawElementBackground(Rect rect, int index, bool isactive, bool isfocused)
