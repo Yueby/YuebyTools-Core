@@ -8,25 +8,43 @@ namespace Yueby.EditorWindowExtends.AnimatorControllerToolExtends
     [InitializeOnLoad]
     public static class AnimatorControllerToolHelper
     {
-        public static Action<bool> OnAnimatorControllerToolState;
-        private static EditorWindow _animatorControllerToolWindow;
+        // public delegate void DoGraphToolbarDelegate(Rect rect);
 
+        // public static DoGraphToolbarDelegate DoGraphToolbar;
+
+        public static Action<bool> OnAnimatorControllerToolState;
+        private static EditorWindow _window;
+
+
+        // public static EditorWindow Window
+        // {
+        //     get
+        //     {
+        //         if (_animatorControllerToolWindow != null) return _animatorControllerToolWindow;
+        //
+        //         var window = Resources.FindObjectsOfTypeAll(AnimatorWindowReflect.Type);
+        //         if (window.Length > 0)
+        //         {
+        //             _animatorControllerToolWindow = window[0] as EditorWindow;
+        //         }
+        //
+        //         return _animatorControllerToolWindow;
+        //     }
+        // }
 
         public static EditorWindow Window
         {
             get
             {
-                if (_animatorControllerToolWindow != null) return _animatorControllerToolWindow;
-
-                var window = Resources.FindObjectsOfTypeAll(AnimatorWindowReflect.AnimatorWindowType);
-                if (window.Length > 0)
+                if (_window == null)
                 {
-                    _animatorControllerToolWindow = window[0] as EditorWindow;
+                    _window = (EditorWindow)AnimatorWindowReflect.ToolFieldInfo.GetValue(null);
                 }
 
-                return _animatorControllerToolWindow;
+                return _window;
             }
         }
+
 
         static AnimatorControllerToolHelper()
         {
