@@ -45,7 +45,7 @@ namespace Yueby.EditorWindowExtends.ProjectBrowserExtends.Drawer
 #endif
 
 
-#if VRC_SDK_VRCSDK3 && !UDON|| !UDONSHARP
+#if !UDON && !UDONSHARP && VRC_SDK_VRCSDK3
             _convertDict.Add(nameof(VRCExpressionsMenu), ".menu");
             _convertDict.Add(nameof(VRCExpressionParameters), ".parameters");
 #endif
