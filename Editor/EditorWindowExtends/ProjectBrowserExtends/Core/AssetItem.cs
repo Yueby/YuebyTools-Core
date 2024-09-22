@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
@@ -24,17 +25,8 @@ namespace Yueby.EditorWindowExtends.ProjectBrowserExtends.Core
             Rect = rect;
             IsHover = rect.Contains(Event.current.mousePosition);
             Path = AssetDatabase.GUIDToAssetPath(Guid);
-
-            if (!string.IsNullOrEmpty(Path))
-            {
-                var attributes = File.GetAttributes(Path);
-                IsFolder = (attributes & FileAttributes.Directory) == FileAttributes.Directory;
-            }
-            else
-            {
-                IsFolder = false;
-            }
             Asset = AssetDatabase.LoadAssetAtPath(Path, typeof(Object));
+            IsFolder = !string.IsNullOrEmpty(Path) && AssetDatabase.IsValidFolder(Path);
         }
 
         public void Refresh(string guid, Rect rect)

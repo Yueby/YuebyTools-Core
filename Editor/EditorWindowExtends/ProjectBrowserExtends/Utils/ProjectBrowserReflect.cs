@@ -1,24 +1,29 @@
 using System;
 using System.Reflection;
+using HarmonyLib;
 using UnityEditor.IMGUI.Controls;
 using Object = UnityEngine.Object;
+
 namespace Yueby.EditorWindowExtends.ProjectBrowserExtends
 {
     public static class ProjectBrowserReflect
     {
-        private static Type _type;
+        public static readonly Type TreeViewItemType = AccessTools.TypeByName("UnityEditor.IMGUI.Controls.TreeViewItem");
+        public static readonly Type AssetsTreeViewGUIType = AccessTools.TypeByName("UnityEditor.AssetsTreeViewGUI");
+        public static readonly Type LocalGroupType = AccessTools.TypeByName("UnityEditor.ObjectListArea").Inner("LocalGroup");
+        public static readonly Type FilterResultType = AccessTools.TypeByName("UnityEditor.FilteredHierarchy").Inner("FilterResult");
+        public static readonly Type BuiltinResourceType = AccessTools.TypeByName("UnityEditor.BuiltinResource");
+
+        public static readonly FieldInfo TreeViewItemParentField = AccessTools.Field(TreeViewItemType, "m_Parent");
+        public static readonly FieldInfo TreeViewItemChildrenField = AccessTools.Field(TreeViewItemType, "m_Children");
+        public static readonly FieldInfo TreeViewItemDepthField = AccessTools.Field(TreeViewItemType, "m_Depth");
+
+
         private static FieldInfo _assetTreeStateField;
         private static FieldInfo _folderTreeStateField;
         private static MethodInfo _isTwoColumnsMethod;
 
-        public static Type Type
-        {
-            get
-            {
-                if (_type == null) _type = ReflectionHelper.GetEditorType("ProjectBrowser");
-                return _type;
-            }
-        }
+        public static readonly Type Type = AccessTools.TypeByName("UnityEditor.ProjectBrowser");
 
         private static FieldInfo AssetTreeStateField
         {

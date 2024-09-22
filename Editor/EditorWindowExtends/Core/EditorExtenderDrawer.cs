@@ -15,7 +15,7 @@ namespace Yueby.EditorWindowExtends.Core
 
         public string SavePath => $"{GetType().FullName}";
         public bool IsVisible => EditorPrefs.GetBool($"{SavePath}.IsVisible", true);
-        public int Order => EditorPrefs.GetInt($"{SavePath}.Order", 0);
+        public  int Order => EditorPrefs.GetInt($"{SavePath}.Order", 0);
         public virtual string DrawerName { get; } = "";
         public virtual string ToolTip { get; } = "";
 
