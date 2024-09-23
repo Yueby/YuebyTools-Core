@@ -71,44 +71,75 @@ namespace Yueby.EditorWindowExtends.ProjectBrowserExtends
 
         public static void OnProjectBrowserObjectAreaItemGUI(int instanceID, Rect rect)
         {
-            var guid = AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(instanceID));
-            if (Extender is { Drawers: null }) return;
+            if (!Extender.IsEnable)
+                return;
 
-            Extender.CheckRepaintAndDoGUI(guid, rect, (assetItem) =>
-            {
-                foreach (var drawer in Extender.Drawers.Where(drawer => drawer is { IsVisible: true }))
+            var guid = AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(instanceID));
+            if (Extender is { Drawers: null })
+                return;
+
+            Extender.CheckRepaintAndDoGUI(
+                guid,
+                rect,
+                (assetItem) =>
                 {
-                    drawer.OnProjectBrowserObjectAreaItemBackgroundGUI(assetItem);
-                    drawer.OnProjectBrowserObjectAreaItemGUI(assetItem);
+                    foreach (
+                        var drawer in Extender.Drawers.Where(drawer =>
+                            drawer is { IsVisible: true }
+                        )
+                    )
+                    {
+                        drawer.OnProjectBrowserObjectAreaItemBackgroundGUI(assetItem);
+                        drawer.OnProjectBrowserObjectAreaItemGUI(assetItem);
+                    }
                 }
-            });
+            );
         }
 
-        public static void OnProjectBrowserTreeViewItemGUI(int instanceID, Rect rect, TreeViewItem item)
+        public static void OnProjectBrowserTreeViewItemGUI(
+            int instanceID,
+            Rect rect,
+            TreeViewItem item
+        )
         {
+            if (!Extender.IsEnable)
+                return;
+
             var guid = AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(instanceID));
-            if (Extender is { Drawers: null }) return;
+            if (Extender is { Drawers: null })
+                return;
 
-            Extender.CheckRepaintAndDoGUI(guid, rect, (assetItem) =>
-            {
-                foreach (var drawer in Extender.Drawers.Where(drawer => drawer is { IsVisible: true }))
+            Extender.CheckRepaintAndDoGUI(
+                guid,
+                rect,
+                (assetItem) =>
                 {
-                    drawer.OnProjectBrowserTreeViewItemBackgroundGUI(assetItem, item);
-                    drawer.OnProjectBrowserTreeViewItemGUI(assetItem, item);
+                    foreach (
+                        var drawer in Extender.Drawers.Where(drawer =>
+                            drawer is { IsVisible: true }
+                        )
+                    )
+                    {
+                        drawer.OnProjectBrowserTreeViewItemBackgroundGUI(assetItem, item);
+                        drawer.OnProjectBrowserTreeViewItemGUI(assetItem, item);
+                    }
                 }
-            });
+            );
         }
-
 
         private void OnProjectBrowserItemGUI(string guid, Rect rect)
         {
-            CheckRepaintAndDoGUI(guid, rect, (assetItem) =>
-            {
-                foreach (var drawer in Drawers.Where(drawer => drawer is { IsVisible: true }))
+            CheckRepaintAndDoGUI(
+                guid,
+                rect,
+                (assetItem) =>
                 {
-                    drawer.OnProjectBrowserGUI(assetItem);
+                    foreach (var drawer in Drawers.Where(drawer => drawer is { IsVisible: true }))
+                    {
+                        drawer.OnProjectBrowserGUI(assetItem);
+                    }
                 }
-            });
+            );
         }
 
         private void CheckRepaintAndDoGUI(string guid, Rect rect, Action<AssetItem> callback)
