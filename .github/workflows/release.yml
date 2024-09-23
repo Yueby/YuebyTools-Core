@@ -74,10 +74,14 @@ jobs:
         run: find "./" -name \*.meta >> metaList
         
       # Make a UnityPackage version of the Package for release
+      - name: Make TempFolder
+        run: |
+          mkdir -p ${{env.packagePath}}/Temp
+      
       - name: Create UnityPackage
         uses: pCYSl5EDgo/create-unitypackage@master
         with:
-          package-path: Packages/${{ env.unityPackage }}
+          package-path: ${{env.packagePath}}/Temp/${{ env.unityPackage }}
           include-files: metaList
       
       # Make a release tag of the version from the package.json file 
@@ -93,7 +97,7 @@ jobs:
         with:
           files: |
             ${{ env.zipFile }}
-            ${{ env.unityPackage }}
+            ${{env.packagePath}}/Temp/${{ env.unityPackage }}
             /package.json 
       # ${{ env.packagePath }}
           tag_name: ${{ env.version }}
