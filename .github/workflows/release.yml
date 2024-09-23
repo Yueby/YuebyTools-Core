@@ -54,11 +54,6 @@ jobs:
           echo "zipFile=${{ vars.PACKAGE_NAME }}-${{ steps.version.outputs.value }}".zip >> $GITHUB_ENV
           echo "unityPackage=${{ vars.PACKAGE_NAME }}-${{ steps.version.outputs.value }}.unitypackage" >> $GITHUB_ENV
           echo "version=${{ steps.version.outputs.value }}" >> $GITHUB_ENV
-
-      - name: Copy files
-        run: |
-          mkdir -p Packages/${{ vars.PACKAGE_NAME }}/
-          cp -R ./ Packages/${{ vars.PACKAGE_NAME }}/
           
       # Zip the Package for release
       - name: Create Package Zip
