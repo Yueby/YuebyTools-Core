@@ -4,10 +4,7 @@ name: Build Release
 
 on: 
   workflow_dispatch:
-  
-env:
-  packageName: "yueby.tools.core"
-  
+
 jobs:
 
   # Validate Repository Configuration
@@ -35,7 +32,8 @@ jobs:
     permissions:
       contents: write
     env:
-      packagePath: Packages/${{ env.packageName }}/
+      packageName: "yueby.tools.core"
+      packagePath: Packages/${{ env.packageName }}
     if: needs.config.outputs.config_package == 'true'
     steps:
 
