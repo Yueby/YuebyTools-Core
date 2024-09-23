@@ -32,7 +32,7 @@ jobs:
     permissions:
       contents: write
     env:
-      packagePath: Packages/${{ vars.PACKAGE_NAME }}/
+      packagePath: Packages/${{ vars.PACKAGE_NAME }}
     if: needs.config.outputs.config_package == 'true'
     steps:
 
@@ -74,14 +74,10 @@ jobs:
         run: find "./" -name \*.meta >> metaList
         
       # Make a UnityPackage version of the Package for release
-      - name: Make TempFolder
-        run: |
-          mkdir -p ${{env.packagePath}}/Temp
-      
       - name: Create UnityPackage
         uses: pCYSl5EDgo/create-unitypackage@master
         with:
-          package-path: ${{env.packagePath}}/Temp/${{ env.unityPackage }}
+          package-path: ${{ env.unityPackage }}
           include-files: metaList
       
       # Make a release tag of the version from the package.json file 
