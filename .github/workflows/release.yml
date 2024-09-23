@@ -32,7 +32,7 @@ jobs:
     permissions:
       contents: write
     env:
-      packagePath: Packages/${{ vars.PACKAGE_NAME }}
+      packagePath: #Packages/${{ vars.PACKAGE_NAME }}
     if: needs.config.outputs.config_package == 'true'
     steps:
 
@@ -55,15 +55,6 @@ jobs:
           echo "unityPackage=${{ vars.PACKAGE_NAME }}-${{ steps.version.outputs.value }}.unitypackage" >> $GITHUB_ENV
           echo "version=${{ steps.version.outputs.value }}" >> $GITHUB_ENV
 
-      - name: Copy files
-        run: |
-          mkdir -p Packages/${{ vars.PACKAGE_NAME }}/
-          cp -R Editor Packages/${{ vars.PACKAGE_NAME }}/
-          cp -R .gitignore Packages/${{ vars.PACKAGE_NAME }}/
-          cp -R Editor.meta Packages/${{ vars.PACKAGE_NAME }}/
-          cp -R package.json Packages/${{ vars.PACKAGE_NAME }}/
-          cp -R package.json.meta Packages/${{ vars.PACKAGE_NAME }}/
-          
       # Zip the Package for release
       - name: Create Package Zip
         working-directory: "${{ env.packagePath }}"
@@ -72,10 +63,10 @@ jobs:
       # Build a list of .meta files for future use
       - name: Track Package Meta Files
         run: find "./" -name \*.meta >> metaList
-        
+      
       # Make a UnityPackage version of the Package for release
       - name: Create UnityPackage
-        uses: pCYSl5EDgo/create-unitypackage@cfcd3cf0391a5ef1306342794866a9897c32af0b
+        uses: pCYSl5EDgo/create-unitypackage@master
         with:
           package-path: ${{ env.unityPackage }}
           include-files: metaList
