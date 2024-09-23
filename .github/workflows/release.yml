@@ -32,8 +32,7 @@ jobs:
     permissions:
       contents: write
     env:
-      packageName: "yueby.tools.core"
-      packagePath: Packages/${{ env.packageName }}
+      packagePath: Packages/${{ vars.PACKAGE_NAME }}
     if: needs.config.outputs.config_package == 'true'
     steps:
 
@@ -58,8 +57,8 @@ jobs:
 
       - name: Copy files
         run: |
-          mkdir -p Packages/${{ env.packageName }}/
-          cp -R ./ Packages/${{ env.packageName }}/
+          mkdir -p Packages/${{ vars.PACKAGE_NAME }}/
+          cp -R ./ Packages/${{ vars.PACKAGE_NAME }}/
           
       # Zip the Package for release
       - name: Create Package Zip
