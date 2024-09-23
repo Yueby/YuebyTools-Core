@@ -93,7 +93,7 @@ jobs:
         with:
           files: |
             ${{ env.zipFile }}
-            ${{env.packagePath}}/Temp/${{ env.unityPackage }}
+            ${{ env.unityPackage }}
             /package.json 
       # ${{ env.packagePath }}
           tag_name: ${{ env.version }}
