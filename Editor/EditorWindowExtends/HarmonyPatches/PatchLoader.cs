@@ -4,7 +4,7 @@ using HarmonyLib;
 using UnityEditor;
 using UnityEngine;
 using Yueby.EditorWindowExtends.Core;
-using YuebyAvatarTools.Packages.yueby.tools.core.Editor.Utils;
+using YuebyTools.Core.Utils;
 
 namespace Yueby.EditorWindowExtends.ProjectBrowserExtends.HarmonyPatches
 {
@@ -20,7 +20,6 @@ namespace Yueby.EditorWindowExtends.ProjectBrowserExtends.HarmonyPatches
         {
             EditorApplication.delayCall += async () =>
             {
-                Log.Info("Preparing to apply Harmony patches", 1, 2, 3, 4);
                 await Task.Delay(TimeSpan.FromSeconds(1f));
                 ApplyPatches();
             };
@@ -36,13 +35,10 @@ namespace Yueby.EditorWindowExtends.ProjectBrowserExtends.HarmonyPatches
                 try
                 {
                     patch(_harmony);
-                    Log.Warning($"{declaringTypeName} >>> Applied");
-                    throw new Exception("Patching failed.");
+                    Log.Info($"{declaringTypeName} --> Applied.");
                 }
                 catch (Exception e)
                 {
-                    Log.Info($"{declaringTypeName} >>> Failed to apply.");
-                    Log.Error("1. Check if the patch is already applied.");
                     Log.Exception(e);
                 }
             }
