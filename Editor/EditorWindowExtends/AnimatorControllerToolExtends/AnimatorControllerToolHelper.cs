@@ -1,6 +1,5 @@
 ﻿using System;
 using UnityEditor;
-using UnityEngine;
 using Yueby.EditorWindowExtends.AnimatorControllerToolExtends.Reflections;
 
 namespace Yueby.EditorWindowExtends.AnimatorControllerToolExtends

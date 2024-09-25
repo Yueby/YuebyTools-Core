@@ -1,13 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using HarmonyLib;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 using Yueby.EditorWindowExtends.Core;
 using Yueby.EditorWindowExtends.ProjectBrowserExtends.Core;
-using Object = UnityEngine.Object;
 
 namespace Yueby.EditorWindowExtends.ProjectBrowserExtends
 {

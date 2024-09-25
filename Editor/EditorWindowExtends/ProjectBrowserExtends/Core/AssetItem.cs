@@ -1,5 +1,3 @@
-using System;
-using System.IO;
 using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -17,6 +15,8 @@ namespace Yueby.EditorWindowExtends.ProjectBrowserExtends.Core
         public bool IsFolder { get; private set; }
         public bool IsHover { get; private set; }
         public Object Asset { get; private set; }
+
+        public ProjectBrowserAsset ProjectBrowserAsset { get; set; }
 
         public AssetItem(string guid, Rect rect)
         {

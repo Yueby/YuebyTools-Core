@@ -137,7 +137,7 @@ namespace Yueby.Core
         /// </summary>
         public bool Remove(T item)
         {
-            int index = Value.IndexOf(item);
+            var index = Value.IndexOf(item);
             if (index >= 0)
             {
                 RemoveAt(index);

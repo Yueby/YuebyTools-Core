@@ -4,7 +4,6 @@ using UnityEngine;
 using Yueby.EditorWindowExtends.ProjectBrowserExtends.Core;
 using Yueby.EditorWindowExtends.Reflections;
 using Yueby.EditorWindowExtends.Utils;
-using YuebyTools.Core.Utils;
 
 namespace Yueby.EditorWindowExtends.ProjectBrowserExtends.Drawer
 {
@@ -41,11 +40,6 @@ namespace Yueby.EditorWindowExtends.ProjectBrowserExtends.Drawer
 
             var rect = item.Rect;
 
-            if (item.OriginRect.height > EditorGUIUtility.singleLineHeight)
-            {
-                rect = ExpandRect(rect, 2);
-            }
-
             if (!item.IsHover)
                 return;
 
@@ -65,7 +59,12 @@ namespace Yueby.EditorWindowExtends.ProjectBrowserExtends.Drawer
                     break;
             }
 
-            rect = ExpandRect(rect, _isDown ? 4 : 2);
+            rect = ExpandRect(
+                rect,
+                _isDown ? 4
+                    : item.OriginRect.height > EditorGUIUtility.singleLineHeight ? 2
+                    : 0
+            );
 
             var color = GameObjectStylesReflect.GetHoveredBackgroundColor();
 

@@ -101,7 +101,7 @@ public class MissingReferencesFinder : MonoBehaviour
                     continue;
                 }
 
-                SerializedObject so = new SerializedObject(component);
+                var so = new SerializedObject(component);
                 var sp = so.GetIterator();
 
                 var objRefValueMethod = typeof(SerializedProperty).GetProperty("objectReferenceStringValue",
@@ -112,7 +112,7 @@ public class MissingReferencesFinder : MonoBehaviour
                 {
                     if (sp.propertyType == SerializedPropertyType.ObjectReference)
                     {
-                        string objectReferenceStringValue = string.Empty;
+                        var objectReferenceStringValue = string.Empty;
 
                         if (objRefValueMethod != null)
                         {
