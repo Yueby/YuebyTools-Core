@@ -30,32 +30,40 @@ namespace Yueby.EditorWindowExtends.ProjectBrowserExtends.Drawer
 
             var rect = item.OriginRect;
 
+            // 横线
+            var hLineRect = rect;
+            hLineRect.height = 1;
+            hLineRect.x -= rect.height * 0.5f;
+            hLineRect.x -= rect.height - 2;
 
-            // 横線
-            var rectHorizLine = rect;
-            rectHorizLine.height = 1;
-            rectHorizLine.x -= rect.height * 0.5f;
-            rectHorizLine.x -= rect.height - 2;
+            // 如果children为0，横线多往右画一点
+            if (currentTreeViewItem.children == null || currentTreeViewItem.children.Count == 0)
+            {
+                hLineRect.width = rect.height * 1.2f; // 增加宽度
+            }
+            else
+            {
+                hLineRect.width = rect.height * 0.5f;
+            }
 
-            rectHorizLine.width = currentTreeViewItem.children == null || currentTreeViewItem.children.Count > 0 ? rect.height * 0.5f : rect.height * 1.2f;
-            rectHorizLine.y += rect.height * 0.5f;
-            EditorGUI.DrawRect(rectHorizLine, LineColor);
+            hLineRect.y += rect.height * 0.5f;
+            EditorGUI.DrawRect(hLineRect, LineColor);
 
-            // 縦線
-            var rectLine = rect;
-            rectLine.width = 1;
-            rectLine.x -= rect.height * 0.5f;
+            // 纵线
+            var vLineRect = rect;
+            vLineRect.width = 1;
+            vLineRect.x -= rect.height * 0.5f;
 
-            rectLine.x -= rect.height - 2;
-            rectLine.height = IsLastChild(currentTreeViewItem) ? rect.height * 0.5f : rect.height;
-            EditorGUI.DrawRect(rectLine, LineColor);
+            vLineRect.x -= rect.height - 2;
+            vLineRect.height = IsLastChild(currentTreeViewItem) ? rect.height * 0.5f : rect.height;
+            EditorGUI.DrawRect(vLineRect, LineColor);
             currentTreeViewItem = currentTreeViewItem.parent;
-            rectLine.height = rect.height;
+            vLineRect.height = rect.height;
 
             while (currentTreeViewItem != null)
             {
-                rectLine.x -= rect.height - 2;
-                if (currentTreeViewItem.parent != null && !IsLastChild(currentTreeViewItem)) EditorGUI.DrawRect(rectLine, LineColor);
+                vLineRect.x -= rect.height - 2;
+                if (currentTreeViewItem.parent != null && !IsLastChild(currentTreeViewItem)) EditorGUI.DrawRect(vLineRect, LineColor);
                 currentTreeViewItem = currentTreeViewItem.parent;
             }
         }

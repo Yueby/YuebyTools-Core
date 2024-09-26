@@ -21,14 +21,11 @@ namespace Yueby.EditorWindowExtends.ProjectBrowserExtends
         private string _lastHoveredGuid;
         private bool _isDirty;
 
-        public static readonly ProjectBrowserExtender Extender;
+        public static readonly ProjectBrowserExtender Instance;
 
         static ProjectBrowserExtender()
         {
-            // var method= ProjectBrowserReflect.Type.GetMethod("OnGUIAssetCallback",ReflectionHelper.InstanceLookup);
-            //
-            // var harmony = new Harmony()
-            Extender = new ProjectBrowserExtender();
+            Instance = new ProjectBrowserExtender();
         }
 
         public ProjectBrowserExtender()
@@ -39,7 +36,7 @@ namespace Yueby.EditorWindowExtends.ProjectBrowserExtends
         [MenuItem(MenuPath, false)]
         private static void ShowOptionWindow()
         {
-            Extender.ShowOptions();
+            Instance.ShowOptions();
         }
 
         public override void SetExtenderEnable(bool value)
@@ -69,20 +66,20 @@ namespace Yueby.EditorWindowExtends.ProjectBrowserExtends
 
         public static void OnProjectBrowserObjectAreaItemGUI(int instanceID, Rect rect)
         {
-            if (!Extender.IsEnable)
+            if (!Instance.IsEnable)
                 return;
 
             var guid = AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(instanceID));
-            if (Extender is { Drawers: null })
+            if (Instance is { Drawers: null })
                 return;
 
-            Extender.CheckRepaintAndDoGUI(
+            Instance.CheckRepaintAndDoGUI(
                 guid,
                 rect,
                 (assetItem) =>
                 {
                     foreach (
-                        var drawer in Extender.Drawers.Where(drawer =>
+                        var drawer in Instance.Drawers.Where(drawer =>
                             drawer is { IsVisible: true }
                         )
                     )
@@ -100,20 +97,20 @@ namespace Yueby.EditorWindowExtends.ProjectBrowserExtends
             TreeViewItem item
         )
         {
-            if (!Extender.IsEnable)
+            if (!Instance.IsEnable)
                 return;
 
             var guid = AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(instanceID));
-            if (Extender is { Drawers: null })
+            if (Instance is { Drawers: null })
                 return;
 
-            Extender.CheckRepaintAndDoGUI(
+            Instance.CheckRepaintAndDoGUI(
                 guid,
                 rect,
                 (assetItem) =>
                 {
                     foreach (
-                        var drawer in Extender.Drawers.Where(drawer =>
+                        var drawer in Instance.Drawers.Where(drawer =>
                             drawer is { IsVisible: true }
                         )
                     )
@@ -181,6 +178,14 @@ namespace Yueby.EditorWindowExtends.ProjectBrowserExtends
             assetItem = new AssetItem(guid, rect);
             _assetItems.Add(guid, assetItem);
             return assetItem;
+        }
+
+        public void RemoveAssetItem(string guid)
+        {
+            if (_assetItems != null && _assetItems.ContainsKey(guid))
+            {
+                _assetItems.Remove(guid);
+            }
         }
 
         public override void Repaint()

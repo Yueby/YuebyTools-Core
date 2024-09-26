@@ -37,7 +37,7 @@ namespace Yueby.EditorWindowExtends.AnimatorControllerToolExtends
             {
                 if (_window == null)
                 {
-                    _window = (EditorWindow)AnimatorWindowReflect.ToolFieldInfo.GetValue(null);
+                    _window = (EditorWindow)AnimatorControllerToolReflect.ToolFieldInfo.GetValue(null);
                 }
 
                 return _window;

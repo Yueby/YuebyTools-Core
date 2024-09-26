@@ -16,19 +16,19 @@ namespace Yueby.EditorWindowExtends.AnimatorControllerToolExtends.Reflections
 
         public static ReorderableList GetParameterReorderableList(Object animatorWindow)
         {
-            var parameterView = AnimatorWindowReflect.ParameterEditor.GetValue(animatorWindow);
+            var parameterView = AnimatorControllerToolReflect.ParameterEditor.GetValue(animatorWindow);
             return ParameterList.GetValue(parameterView) as ReorderableList;
         }
 
         public static Vector2 GetParameterScrollPosition(Object animatorWindow)
         {
-            var parameterView = AnimatorWindowReflect.ParameterEditor.GetValue(animatorWindow);
+            var parameterView = AnimatorControllerToolReflect.ParameterEditor.GetValue(animatorWindow);
             return (Vector2)ScrollPosition.GetValue(parameterView);
         }
 
         public static void SetParameterScrollPosition(Object animatorWindow, Vector2 position)
         {
-            var parameterView = AnimatorWindowReflect.ParameterEditor.GetValue(animatorWindow);
+            var parameterView = AnimatorControllerToolReflect.ParameterEditor.GetValue(animatorWindow);
             ScrollPosition.SetValue(parameterView, position);
         }
     }

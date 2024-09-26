@@ -17,19 +17,19 @@ public static class LayerControllerViewReflect
 
     public static ReorderableList GetLayerReorderableList(Object animatorWindow)
     {
-        var layerView = AnimatorWindowReflect.LayerEditor.GetValue(animatorWindow);
+        var layerView = AnimatorControllerToolReflect.LayerEditor.GetValue(animatorWindow);
         return LayerList.GetValue(layerView) as ReorderableList;
     }
 
     public static Vector2 GetLayerScrollPosition(Object animatorWindow)
     {
-        var layerView = AnimatorWindowReflect.LayerEditor.GetValue(animatorWindow);
+        var layerView = AnimatorControllerToolReflect.LayerEditor.GetValue(animatorWindow);
         return (Vector2)LayerScroll.GetValue(layerView);
     }
 
     public static void SetLayerScrollPosition(Object animatorWindow, Vector2 position)
     {
-        var layerView = AnimatorWindowReflect.LayerEditor.GetValue(animatorWindow);
+        var layerView = AnimatorControllerToolReflect.LayerEditor.GetValue(animatorWindow);
         LayerScroll.SetValue(layerView, position);
     }
 }

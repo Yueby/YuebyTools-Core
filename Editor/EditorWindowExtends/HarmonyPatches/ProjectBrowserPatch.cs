@@ -32,8 +32,8 @@ namespace Yueby.EditorWindowExtends.ProjectBrowserExtends.HarmonyPatches
                 ProjectBrowserReflect.BuiltinResourceType,
                 typeof(bool)
             }), new HarmonyMethod(drawItemMethod));
-            
-            ProjectBrowserExtender.Extender?.Repaint();
+
+            ProjectBrowserExtender.Instance?.Repaint();
         }
 
 

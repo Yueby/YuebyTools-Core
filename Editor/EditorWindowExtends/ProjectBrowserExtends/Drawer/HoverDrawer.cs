@@ -74,6 +74,7 @@ namespace Yueby.EditorWindowExtends.ProjectBrowserExtends.Drawer
                 GUI.Label(rect, GUIContent.none, style);
             }
 
+            // EditorWindow.mouseOverWindow.Repaint();
             // Extender.Repaint();
         }
 

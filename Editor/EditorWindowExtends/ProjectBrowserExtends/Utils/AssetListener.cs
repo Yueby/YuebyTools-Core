@@ -18,7 +18,6 @@ namespace Yueby.EditorWindowExtends.ProjectBrowserExtends
         public List<ProjectBrowserAsset> Children = new();
         private Dictionary<string, ProjectBrowserAsset> _childrenDict = new(); // 新增字典以提高查找效率
 
-
         public ProjectBrowserAsset(string path, string guid)
         {
             Path = path;
@@ -133,7 +132,6 @@ namespace Yueby.EditorWindowExtends.ProjectBrowserExtends
             return addedAssets; // 返回所有被添加的资产
         }
 
-
         public void SetNewAsset(bool isNew)
         {
             if (Children.Count <= 0 && isNew)
@@ -160,7 +158,6 @@ namespace Yueby.EditorWindowExtends.ProjectBrowserExtends
             // AssetListener.OutputJson();
         }
 
-
         public void RefreshParent(ProjectBrowserAsset asset)
         {
             if (asset == null) return;
@@ -179,7 +176,6 @@ namespace Yueby.EditorWindowExtends.ProjectBrowserExtends
         static AssetListener()
         {
             InitializeFileTree(); // 初始化文件树
-            OutputJson(); // 输出 JSON 数据到控制台
         }
 
         private static void InitializeFileTree()
@@ -214,8 +210,23 @@ namespace Yueby.EditorWindowExtends.ProjectBrowserExtends
 
         public static void OutputJson()
         {
-            // var json = JsonUtility.ToJson(Root, true); // 序列化为 JSON
-            // // Debug.Log($"初始化后的 JSON 数据:\n{json}"); // 输出 JSON 数据
+            // 序列化为 JSON
+            var json = JsonUtility.ToJson(Root, true);
+
+            // 获取桌面的路径
+            string desktopPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.Desktop);
+            // 定义输出的文件路径
+            string filePath = Path.Combine(desktopPath, "ProjectBrowserAssets.json");
+
+            // 如果文件已经存在，则删除它
+            if (File.Exists(filePath))
+            {
+                File.Delete(filePath);
+            }
+
+            // 将 JSON 写入文件
+            File.WriteAllText(filePath, json);
+            Debug.Log($"JSON 数据已输出到: {filePath}"); // 在控制台打印输出文件路径
         }
 
         static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromAssetPaths)
@@ -259,16 +270,33 @@ namespace Yueby.EditorWindowExtends.ProjectBrowserExtends
                     // 从 Assets 文件夹中删除资产
                     var removedAssetGuid = AssetDatabase.AssetPathToGUID(deletedAsset);
                     Root.FindByGuid(AssetDatabase.AssetPathToGUID("Assets"))?.RemoveByGuid(removedAssetGuid);
+                    ProjectBrowserExtender.Instance.RemoveAssetItem(removedAssetGuid);
                 }
                 else if (deletedAsset.StartsWith("Packages/"))
                 {
                     // 从 Packages 文件夹中删除资产
                     var removedAssetGuid = AssetDatabase.AssetPathToGUID(deletedAsset);
                     Root.FindByGuid(AssetDatabase.AssetPathToGUID("Packages"))?.RemoveByGuid(removedAssetGuid);
+                    ProjectBrowserExtender.Instance.RemoveAssetItem(removedAssetGuid);
                 }
             }
 
-            OutputJson(); // 每次更新后输出 JSON 数据
+            // OutputJson(); // 每次更新后输出 JSON 数据
         }
+
+        public static void ClearAsset(ProjectBrowserAsset asset)
+        {
+            if (asset == null) return;
+
+            // 将当前资产的 IsNewAsset 设置为 false
+            asset.SetNewAsset(false); // 会更新资产并调用 RefreshParent
+
+            // 遍历子节点，递归调用 ClearAsset
+            foreach (var child in asset.Children)
+            {
+                ClearAsset(child); // 递归清理子节点
+            }
+        }
+
     }
 }

@@ -11,7 +11,11 @@ namespace Yueby.EditorWindowExtends.ProjectBrowserExtends.HarmonyPatches
     internal static class PatchLoader
     {
         public const string BaseMenuPath = "Tools/YuebyTools/Editor Window Extends/";
-        private static readonly Action<Harmony>[] Patches = { ProjectBrowserPatch.Patch };
+        private static readonly Action<Harmony>[] Patches =
+        {
+            ProjectBrowserPatch.Patch ,
+            // AnimatorControllerToolPatch.Patch
+         };
 
         private static Harmony _harmony;
 
@@ -52,11 +56,11 @@ namespace Yueby.EditorWindowExtends.ProjectBrowserExtends.HarmonyPatches
             _harmony.UnpatchAll();
         }
 
-        [MenuItem(BaseMenuPath + "Reapply patches")]
-        private static void ReapplyPatches()
-        {
-            UnpatchAll();
-            ApplyPatches();
-        }
+        // [MenuItem(BaseMenuPath + "Reapply patches")]
+        // private static void ReapplyPatches()
+        // {
+        //     UnpatchAll();
+        //     ApplyPatches();
+        // }
     }
 }
