@@ -4,32 +4,48 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 
+using HarmonyLib;
+
 namespace Yueby.Utils.Reflections
 {
     public static class ReflectionUtil
     {
-        public static T MapToInterface<T>(object obj) where T : class
+        public static T Create<T>(object source) where T : new()
         {
-            // 获取接口类型和对象类型
-            Type interfaceType = typeof(T);
-            Type objectType = obj.GetType();
+            // 创建目标对象
+            var target = new T();
 
-            // 创建一个实现接口的动态类型
-            object mappedObject = Activator.CreateInstance(interfaceType);
+            // 获取源对象的类型
+            var sourceType = source.GetType();
 
-            // 遍历接口的所有属性
-            foreach (PropertyInfo property in interfaceType.GetProperties())
+            // 获取目标对象的类型
+            var targetType = typeof(T);
+
+            // 映射属性
+            foreach (var targetProperty in targetType.GetProperties())
             {
-                // 获取对象中对应属性
-                PropertyInfo objectProperty = objectType.GetProperty(property.Name);
-                if (objectProperty != null && objectProperty.CanRead)
+                // 使用 AccessTools 获取源对象的属性
+                var sourceProperty = AccessTools.Property(sourceType, targetProperty.Name);
+                if (sourceProperty != null && sourceProperty.CanRead && targetProperty.CanWrite)
                 {
-                    // 将对象属性值赋给接口的属性
-                    object value = objectProperty.GetValue(obj);
-                    property.SetValue(mappedObject, value);
+                    var value = sourceProperty.GetValue(source);
+                    targetProperty.SetValue(target, value);
                 }
             }
-            return mappedObject as T;
+
+            // 映射字段
+            foreach (var targetField in targetType.GetFields())
+            {
+                // 使用 AccessTools 获取源对象的字段
+                var sourceField = AccessTools.Field(sourceType, targetField.Name);
+                if (sourceField != null)
+                {
+                    var value = sourceField.GetValue(source);
+                    targetField.SetValue(target, value);
+                }
+            }
+
+            return target;
         }
     }
 }

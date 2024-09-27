@@ -14,7 +14,7 @@ namespace Yueby.EditorWindowExtends.ProjectBrowserExtends.HarmonyPatches
         private static readonly Action<Harmony>[] Patches =
         {
             ProjectBrowserPatch.Patch ,
-            // AnimatorControllerToolPatch.Patch
+             AnimatorControllerToolPatch.Patch
          };
 
         private static Harmony _harmony;

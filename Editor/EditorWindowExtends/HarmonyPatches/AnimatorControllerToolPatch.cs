@@ -14,6 +14,8 @@ namespace Yueby.EditorWindowExtends.ProjectBrowserExtends.HarmonyPatches
 {
     public static class AnimatorControllerToolPatch
     {
+        private static Dictionary<int, StateNode> _stateNodeCaches = new();
+
         internal static void Patch(Harmony harmony)
         {
             var nodeUIMethod = AccessTools.Method(typeof(AnimatorControllerToolPatch), nameof(NodeUI));
@@ -30,10 +32,21 @@ namespace Yueby.EditorWindowExtends.ProjectBrowserExtends.HarmonyPatches
         //     return true;
         // }
 
-        private static bool NodeUI(object __instance, GraphGUI host)
+        private static bool NodeUI(Object __instance, GraphGUI host)
         {
-            var stateNode = ReflectionUtil.MapToInterface<StateNode>(__instance);
-            Log.Info(stateNode.state);
+            if (_stateNodeCaches.TryGetValue(__instance.GetInstanceID(), out var stateNode))
+            {
+                Log.Info(JsonUtility.ToJson(stateNode));
+            }
+            else
+            {
+                stateNode = ReflectionUtil.Create<StateNode>(__instance);
+                _stateNodeCaches.Add(__instance.GetInstanceID(), stateNode);
+            }
+
+
+            //Log.Info(JsonUtility.ToJson(stateNode));
+
 
             // var label = stateNode.state.motion == null ? "None" : stateNode.state.motion.name;
 
