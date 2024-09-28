@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
+using System.Reflection;
 using HarmonyLib;
+using YuebyTools.Core.Utils;
 
 namespace Yueby.Utils.Reflections
 {
@@ -10,34 +10,27 @@ namespace Yueby.Utils.Reflections
     {
         private static readonly ConcurrentDictionary<(Type Source, Type Target), Action<object, object>> MappingCache = new();
 
-        // ∑∫–Õ”≥…‰
-        public static TTarget Map<TSource, TTarget>(TSource source) where TTarget : new()
+        public static TTarget Map<TSource, TTarget>(TSource source) where TSource : class where TTarget : new()
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
-
             var target = new TTarget();
             Map(source, target);
             return target;
         }
 
-        // ∑«∑∫–Õ”≥…‰ªÚ‘¥∂‘œÛŒ™ object µƒ”≥…‰
         public static void Map(object source, object target)
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
             if (target == null) throw new ArgumentNullException(nameof(target));
-
             var sourceType = source.GetType();
             var targetType = target.GetType();
-
             var mappingAction = MappingCache.GetOrAdd((sourceType, targetType), _ => CreateMappingAction(sourceType, targetType));
             mappingAction(source, target);
         }
 
-        // ‘¥∂‘œÛŒ™ object£¨ƒø±Í∂‘œÛŒ™∑∫–Õ
         public static TTarget Map<TTarget>(object source) where TTarget : new()
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
-
             var target = new TTarget();
             Map(source, target);
             return target;
@@ -45,40 +38,109 @@ namespace Yueby.Utils.Reflections
 
         private static Action<object, object> CreateMappingAction(Type sourceType, Type targetType)
         {
-            var sourceProperties = AccessTools.GetDeclaredProperties(sourceType);
-            var targetProperties = AccessTools.GetDeclaredProperties(targetType);
-
-            var sourceFields = AccessTools.GetDeclaredFields(sourceType);
-            var targetFields = AccessTools.GetDeclaredFields(targetType);
-
             return (sourceObj, targetObj) =>
             {
-                // ”≥…‰ Ù–‘
-                foreach (var targetProperty in targetProperties)
+                MapProperties(sourceType, sourceObj, targetType, targetObj);
+                MapFields(sourceType, sourceObj, targetType, targetObj);
+            };
+        }
+
+        private static void MapProperties(Type sourceType, object sourceObj, Type targetType, object targetObj)
+        {
+            foreach (var targetProperty in targetType.GetProperties())
+            {
+                var sourceProperty = AccessTools.Property(sourceType, GetSourceName(targetProperty));
+                if (sourceProperty != null && sourceProperty.CanRead && targetProperty.CanWrite)
                 {
-                    var sourceProperty = sourceProperties.FirstOrDefault(p => p.Name == targetProperty.Name);
-                    if (sourceProperty != null && sourceProperty.CanRead && targetProperty.CanWrite)
+                    try
                     {
                         var value = sourceProperty.GetValue(sourceObj);
-                        if (value != null && targetProperty.PropertyType != sourceProperty.PropertyType)
-                        {
-                            value = Convert.ChangeType(value, targetProperty.PropertyType);
-                        }
-                        targetProperty.SetValue(targetObj, value);
+                        SetPropertyOrFieldValue(targetProperty, targetObj, value);
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Info($"Error mapping property {targetProperty.Name}: {ex.Message}");
                     }
                 }
+            }
+        }
 
-                // ”≥…‰◊÷∂Œ
-                foreach (var targetField in targetFields)
+        private static void MapFields(Type sourceType, object sourceObj, Type targetType, object targetObj)
+        {
+            foreach (var targetField in targetType.GetFields())
+            {
+                var sourceField = AccessTools.Field(sourceType, GetSourceName(targetField));
+                if (sourceField != null)
                 {
-                    var sourceField = sourceFields.FirstOrDefault(f => f.Name == targetField.Name);
-                    if (sourceField != null)
+                    try
                     {
                         var value = sourceField.GetValue(sourceObj);
-                        targetField.SetValue(targetObj, value);
+                        SetPropertyOrFieldValue(targetField, targetObj, value);
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Info($"Error mapping field {targetField.Name}: {ex.Message}");
                     }
                 }
-            };
+            }
+        }
+
+        private static string GetSourceName(MemberInfo memberInfo)
+        {
+            if (Attribute.IsDefined(memberInfo, typeof(CustomMappingAttribute)))
+            {
+                var customMappingAttr = memberInfo.GetCustomAttribute<CustomMappingAttribute>();
+                return customMappingAttr.SourceName; // ËøîÂõûËá™ÂÆö‰πâÂêçÁß∞
+            }
+
+            return memberInfo.Name; // ÈªòËÆ§‰ΩøÁî®ÊàêÂëòÂêçÁß∞
+        }
+
+        private static void SetPropertyOrFieldValue(MemberInfo memberInfo, object targetObj, object value)
+        {
+            if (value == null)
+            {
+                if (memberInfo is PropertyInfo propertyInfo && propertyInfo.CanWrite)
+                {
+                    propertyInfo.SetValue(targetObj, null);
+                }
+                else if (memberInfo is FieldInfo fieldInfo)
+                {
+                    fieldInfo.SetValue(targetObj, null);
+                }
+
+                return;
+            }
+
+            try
+            {
+                if (memberInfo is PropertyInfo property && property.CanWrite)
+                {
+                    if (property.PropertyType.IsInstanceOfType(value))
+                    {
+                        property.SetValue(targetObj, value);
+                    }
+                    else if (value is IConvertible)
+                    {
+                        property.SetValue(targetObj, Convert.ChangeType(value, property.PropertyType, System.Globalization.CultureInfo.InvariantCulture));
+                    }
+                }
+                else if (memberInfo is FieldInfo field)
+                {
+                    if (field.FieldType.IsInstanceOfType(value))
+                    {
+                        field.SetValue(targetObj, value);
+                    }
+                    else if (value is IConvertible)
+                    {
+                        field.SetValue(targetObj, Convert.ChangeType(value, field.FieldType, System.Globalization.CultureInfo.InvariantCulture));
+                    }
+                }
+            }
+            catch (InvalidCastException ex)
+            {
+                Log.Info($"Error setting value for {memberInfo.Name}: {ex.Message}");
+            }
         }
     }
 }

@@ -2,9 +2,10 @@
 using HarmonyLib;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
+using Yueby.EditorWindowExtends.ProjectBrowserExtends;
 using Object = UnityEngine.Object;
 
-namespace Yueby.EditorWindowExtends.ProjectBrowserExtends.HarmonyPatches
+namespace Yueby.EditorWindowExtends.HarmonyPatches
 {
     public static class ProjectBrowserPatch
     {

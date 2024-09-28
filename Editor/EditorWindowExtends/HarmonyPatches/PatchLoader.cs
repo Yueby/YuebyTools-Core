@@ -6,7 +6,7 @@ using UnityEngine;
 using Yueby.EditorWindowExtends.Core;
 using YuebyTools.Core.Utils;
 
-namespace Yueby.EditorWindowExtends.ProjectBrowserExtends.HarmonyPatches
+namespace Yueby.EditorWindowExtends.HarmonyPatches
 {
     internal static class PatchLoader
     {

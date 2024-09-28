@@ -16,5 +16,6 @@ namespace Yueby.EditorWindowExtends.AnimatorControllerToolExtends.Reflections
         public static readonly Type EdgeInfoType = AccessTools.TypeByName("UnityEditor.Graphs.AnimationStateMachine.EdgeInfo");
 
         public static readonly Type StateNodeType = AccessTools.TypeByName("UnityEditor.Graphs.AnimationStateMachine.StateNode");
+        public static readonly Type GraphGUIType = AccessTools.TypeByName("UnityEditor.Graphs.AnimationStateMachine.GraphGUI");
     }
 }

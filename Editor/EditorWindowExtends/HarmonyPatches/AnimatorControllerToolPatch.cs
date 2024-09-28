@@ -1,29 +1,27 @@
-using System.Collections;
 using System.Collections.Generic;
 using HarmonyLib;
 using UnityEditor;
-using UnityEditor.Animations;
 using UnityEditor.Graphs;
 using UnityEngine;
 using Yueby.EditorWindowExtends.AnimatorControllerToolExtends.Reflections;
-using Yueby.EditorWindowExtends.AnimatorControllerToolExtends.Reflections.Mapper;
+using Yueby.EditorWindowExtends.HarmonyPatches.Mapper;
 using Yueby.Utils.Reflections;
 using YuebyTools.Core.Utils;
+using GraphGUI = Yueby.EditorWindowExtends.HarmonyPatches.Mapper.GraphGUI;
 
-namespace Yueby.EditorWindowExtends.ProjectBrowserExtends.HarmonyPatches
+namespace Yueby.EditorWindowExtends.HarmonyPatches
 {
     public static class AnimatorControllerToolPatch
     {
         private static Dictionary<int, StateNode> _stateNodeCaches = new();
+        private static Object _graphUIInstance = null;
 
         internal static void Patch(Harmony harmony)
         {
-            var nodeUIMethod = AccessTools.Method(typeof(AnimatorControllerToolPatch), nameof(NodeUI));
-            harmony.Patch(AnimatorControllerToolReflect.StateNodeType.Method("NodeUI", new[]
-            {
-                typeof(GraphGUI),
-            }), new HarmonyMethod(nodeUIMethod));
+            var nodeUIMethodPrefix = AccessTools.Method(typeof(AnimatorControllerToolPatch), nameof(OnGraphGUIPrefix));
+            var nodeUIMethodPostfix = AccessTools.Method(typeof(AnimatorControllerToolPatch), nameof(OnGraphGUIPostfix));
 
+            harmony.Patch(AnimatorControllerToolReflect.GraphGUIType.Method("OnGraphGUI"), new HarmonyMethod(nodeUIMethodPrefix), new HarmonyMethod(nodeUIMethodPostfix));
         }
 
         // private static bool DrawEdge(object __instance, Edge edge, Texture2D tex, Color color, object info, bool viewHasLiveLinkExactEdge)
@@ -32,29 +30,26 @@ namespace Yueby.EditorWindowExtends.ProjectBrowserExtends.HarmonyPatches
         //     return true;
         // }
 
-        private static bool NodeUI(Object __instance, GraphGUI host)
+
+        private static StateNode _currentStateNode;
+
+        private static void OnGraphGUIPrefix(Object __instance)
         {
-            if (_stateNodeCaches.TryGetValue(__instance.GetInstanceID(), out var stateNode))
-            {
-                Log.Info(JsonUtility.ToJson(stateNode));
-            }
-            else
-            {
-                stateNode = ReflectionUtil.Create<StateNode>(__instance);
-                _stateNodeCaches.Add(__instance.GetInstanceID(), stateNode);
-            }
+            if (__instance == null) return;
 
+            var graphGUI = AutoMapper.Map<GraphGUI>(__instance);
 
-            //Log.Info(JsonUtility.ToJson(stateNode));
+            Log.Info(JsonUtility.ToJson(graphGUI));
+        }
 
+        private static void OnGraphGUIPostfix()
+        {
+            // if (_graphUIInstance == null) return;
 
-            // var label = stateNode.state.motion == null ? "None" : stateNode.state.motion.name;
+            // AutoMapper.Map(n, _currentStateNode ??= new StateNode());
 
-            // EditorGUI.LabelField(stateNode.position, label);
-
-            // if (state.motion != null)
-            //     Log.Info(state.motion.name);
-            return true;
+            // var label = _currentStateNode.state.motion == null ? "None" : _currentStateNode.state.motion.name;
+            // GUI.Label(_currentStateNode.position, label, EditorStyles.centeredGreyMiniLabel);
         }
     }
 }
