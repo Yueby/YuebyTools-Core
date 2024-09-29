@@ -1,20 +1,26 @@
 using System.Collections.Generic;
 using HarmonyLib;
 using UnityEditor;
-using UnityEditor.Graphs;
+using UnityEditor.Animations;
 using UnityEngine;
 using Yueby.EditorWindowExtends.AnimatorControllerToolExtends.Reflections;
 using Yueby.EditorWindowExtends.HarmonyPatches.Mapper;
 using Yueby.Utils.Reflections;
 using YuebyTools.Core.Utils;
 using GraphGUI = Yueby.EditorWindowExtends.HarmonyPatches.Mapper.GraphGUI;
+using Object = UnityEngine.Object;
 
 namespace Yueby.EditorWindowExtends.HarmonyPatches
 {
     public static class AnimatorControllerToolPatch
     {
         private static Dictionary<int, StateNode> _stateNodeCaches = new();
-        private static Object _graphUIInstance = null;
+        private static GraphGUI _graphGUI;
+        private static List<string> _nodeIgnore = new(){
+            "Any State",
+            "Entry",
+            "Exit",
+        };
 
         internal static void Patch(Harmony harmony)
         {
@@ -31,25 +37,37 @@ namespace Yueby.EditorWindowExtends.HarmonyPatches
         // }
 
 
-        private static StateNode _currentStateNode;
 
         private static void OnGraphGUIPrefix(Object __instance)
         {
-            if (__instance == null) return;
 
-            var graphGUI = AutoMapper.Map<GraphGUI>(__instance);
+            if (__instance == null)
+                return;
 
-            Log.Info(JsonUtility.ToJson(graphGUI));
+            _graphGUI = ReflectionUtil.Map<GraphGUI>(__instance);
+
+            // Log.Info(JsonUtility.ToJson(graphGUI), __instance.GetInstanceID(), "|", graphGUI.Name, graphGUI.Graph.nodes.Count);
         }
 
         private static void OnGraphGUIPostfix()
         {
-            // if (_graphUIInstance == null) return;
+            if (_graphGUI == null) return;
+            foreach (var node in _graphGUI.Graph.nodes)
+            {
+                if (_nodeIgnore.Contains(node.Title)) continue;
 
-            // AutoMapper.Map(n, _currentStateNode ??= new StateNode());
+                var label = node.State.motion == null ? "None" : node.State.motion.name;
+                var rect = node.Position;
+                rect.y += EditorGUIUtility.singleLineHeight * 0.5f;
+                var style = GUI.skin.label;
+                style.alignment = TextAnchor.MiddleCenter;
+                var color = style.normal.textColor;
+                color.a = 0.2f;
+                style.fontStyle = FontStyle.Bold;
 
-            // var label = _currentStateNode.state.motion == null ? "None" : _currentStateNode.state.motion.name;
-            // GUI.Label(_currentStateNode.position, label, EditorStyles.centeredGreyMiniLabel);
+
+                GUI.Label(rect, label, style);
+            }
         }
     }
 }

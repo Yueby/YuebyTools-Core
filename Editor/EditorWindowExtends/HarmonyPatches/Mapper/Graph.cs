@@ -1,13 +1,15 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEditor.Graphs;
 using Yueby.Utils.Reflections;
 
 namespace Yueby.EditorWindowExtends.HarmonyPatches.Mapper
 {
+
     [MappingClass]
-    public class Graph
+    [Serializable]
+    public class Graph : Object
     {
-        public List<Node> nodes = new List<Node>();
-        public string name;
+        public List<StateNode> nodes = new List<StateNode>();
     }
 }

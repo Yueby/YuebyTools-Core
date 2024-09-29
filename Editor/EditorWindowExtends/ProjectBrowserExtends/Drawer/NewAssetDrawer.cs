@@ -31,32 +31,32 @@ namespace Yueby.EditorWindowExtends.ProjectBrowserExtends.Drawer
             );
             var dotStyle = new GUIStyle(GUI.skin.label)
             {
-                fontSize = 12,
+                fontSize = 10,
                 fontStyle = FontStyle.Bold,
                 normal = { textColor = Color.green },
             };
 
             GUI.Label(dotRect, new GUIContent("●"), dotStyle);
 
-            if (!item.IsHover || !item.IsFolder)
+            if (!item.IsHover)
                 return;
-            var content = EditorGUIUtility.IconContent(
-                EditorGUIUtility.isProSkin ? "d_Package Manager" : "Package Manager"
-            );
-            content.tooltip = "Clear New Asset Dot";
-            DrawIconButton(
-                item,
-                () =>
-                {
-                    ClearDot(item.ProjectBrowserAsset);
-                },
-                content
-            );
 
             if (item.ProjectBrowserAsset.IsNewAsset && Event.current.type == EventType.MouseDown)
             {
                 item.ProjectBrowserAsset.SetNewAsset(false);
             }
+
+            if (!item.IsFolder) return;
+            var content = EditorGUIUtility.IconContent(
+                EditorGUIUtility.isProSkin ? "d_Package Manager" : "Package Manager"
+            );
+            content.tooltip = "Clear New Asset Dot";
+            DrawIconButton(item, () =>
+            {
+                ClearDot(item.ProjectBrowserAsset);
+            }, content);
+
+
         }
 
         private void ClearDot(ProjectBrowserAsset asset)

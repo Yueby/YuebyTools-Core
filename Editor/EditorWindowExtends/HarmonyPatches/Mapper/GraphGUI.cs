@@ -1,12 +1,13 @@
-﻿using UnityEditor.Graphs;
+﻿using System;
+using UnityEditor.Graphs;
 using Yueby.Utils.Reflections;
 
 namespace Yueby.EditorWindowExtends.HarmonyPatches.Mapper
 {
     [MappingClass]
-    public class GraphGUI
+    [Serializable]
+    public class GraphGUI : Object
     {
         [CustomMapping("m_Graph")] public Graph Graph;
-        public string name;
     }
 }

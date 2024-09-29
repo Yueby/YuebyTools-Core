@@ -5,18 +5,16 @@ using Yueby.Utils.Reflections;
 namespace Yueby.EditorWindowExtends.HarmonyPatches.Mapper
 {
     [MappingClass]
-    public class StateNode
+    public class StateNode : Object
     {
-        public AnimatorState state;
+        [CustomMapping("state")]
+        public AnimatorState State;
 
-        public Rect position;
-        public string title { get; set; }
+        [CustomMapping("position")]
+        public Rect Position;
 
-        public int m_InstanceID;
+        [CustomMapping("title")]
+        public string Title { get; set; }
 
-        public int GetInstanceID()
-        {
-            return m_InstanceID;
-        }
     }
 }

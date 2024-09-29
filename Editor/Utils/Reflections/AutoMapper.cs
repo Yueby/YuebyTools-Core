@@ -22,8 +22,10 @@ namespace Yueby.Utils.Reflections
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
             if (target == null) throw new ArgumentNullException(nameof(target));
+
             var sourceType = source.GetType();
             var targetType = target.GetType();
+
             var mappingAction = MappingCache.GetOrAdd((sourceType, targetType), _ => CreateMappingAction(sourceType, targetType));
             mappingAction(source, target);
         }
@@ -47,7 +49,7 @@ namespace Yueby.Utils.Reflections
 
         private static void MapProperties(Type sourceType, object sourceObj, Type targetType, object targetObj)
         {
-            foreach (var targetProperty in targetType.GetProperties())
+            foreach (var targetProperty in AccessTools.GetDeclaredProperties(targetType))
             {
                 var sourceProperty = AccessTools.Property(sourceType, GetSourceName(targetProperty));
                 if (sourceProperty != null && sourceProperty.CanRead && targetProperty.CanWrite)
@@ -55,19 +57,24 @@ namespace Yueby.Utils.Reflections
                     try
                     {
                         var value = sourceProperty.GetValue(sourceObj);
-                        SetPropertyOrFieldValue(targetProperty, targetObj, value);
+                        Log.Info($"Mapping property {sourceProperty.Name} to {targetProperty.Name}, value: {value}");
+                        targetProperty.SetValue(targetObj, value);
                     }
                     catch (Exception ex)
                     {
                         Log.Info($"Error mapping property {targetProperty.Name}: {ex.Message}");
                     }
                 }
+                else
+                {
+                    Log.Info($"Property {targetProperty.Name} not found in source or not accessible.");
+                }
             }
         }
 
         private static void MapFields(Type sourceType, object sourceObj, Type targetType, object targetObj)
         {
-            foreach (var targetField in targetType.GetFields())
+            foreach (var targetField in AccessTools.GetDeclaredFields(targetType))
             {
                 var sourceField = AccessTools.Field(sourceType, GetSourceName(targetField));
                 if (sourceField != null)
@@ -75,12 +82,17 @@ namespace Yueby.Utils.Reflections
                     try
                     {
                         var value = sourceField.GetValue(sourceObj);
-                        SetPropertyOrFieldValue(targetField, targetObj, value);
+                        Log.Info($"Mapping field {sourceField.Name} to {targetField.Name}, value: {value}");
+                        targetField.SetValue(targetObj, value);
                     }
                     catch (Exception ex)
                     {
                         Log.Info($"Error mapping field {targetField.Name}: {ex.Message}");
                     }
+                }
+                else
+                {
+                    Log.Info($"Field {targetField.Name} not found in source or not accessible.");
                 }
             }
         }
@@ -96,51 +108,9 @@ namespace Yueby.Utils.Reflections
             return memberInfo.Name; // 默认使用成员名称
         }
 
-        private static void SetPropertyOrFieldValue(MemberInfo memberInfo, object targetObj, object value)
+        private static bool IsMappingClass(Type type)
         {
-            if (value == null)
-            {
-                if (memberInfo is PropertyInfo propertyInfo && propertyInfo.CanWrite)
-                {
-                    propertyInfo.SetValue(targetObj, null);
-                }
-                else if (memberInfo is FieldInfo fieldInfo)
-                {
-                    fieldInfo.SetValue(targetObj, null);
-                }
-
-                return;
-            }
-
-            try
-            {
-                if (memberInfo is PropertyInfo property && property.CanWrite)
-                {
-                    if (property.PropertyType.IsInstanceOfType(value))
-                    {
-                        property.SetValue(targetObj, value);
-                    }
-                    else if (value is IConvertible)
-                    {
-                        property.SetValue(targetObj, Convert.ChangeType(value, property.PropertyType, System.Globalization.CultureInfo.InvariantCulture));
-                    }
-                }
-                else if (memberInfo is FieldInfo field)
-                {
-                    if (field.FieldType.IsInstanceOfType(value))
-                    {
-                        field.SetValue(targetObj, value);
-                    }
-                    else if (value is IConvertible)
-                    {
-                        field.SetValue(targetObj, Convert.ChangeType(value, field.FieldType, System.Globalization.CultureInfo.InvariantCulture));
-                    }
-                }
-            }
-            catch (InvalidCastException ex)
-            {
-                Log.Info($"Error setting value for {memberInfo.Name}: {ex.Message}");
-            }
+            return Attribute.IsDefined(type, typeof(MappingClassAttribute));
         }
     }
 }
