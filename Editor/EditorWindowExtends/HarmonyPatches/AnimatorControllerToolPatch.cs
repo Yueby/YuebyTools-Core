@@ -16,11 +16,14 @@ namespace Yueby.EditorWindowExtends.HarmonyPatches
     {
         private static Dictionary<int, StateNode> _stateNodeCaches = new();
         private static GraphGUI _graphGUI;
-        private static List<string> _nodeIgnore = new(){
+
+        private static readonly List<string> NodeIgnore = new()
+        {
             "Any State",
             "Entry",
             "Exit",
         };
+
 
         internal static void Patch(Harmony harmony)
         {
@@ -37,10 +40,8 @@ namespace Yueby.EditorWindowExtends.HarmonyPatches
         // }
 
 
-
         private static void OnGraphGUIPrefix(Object __instance)
         {
-
             if (__instance == null)
                 return;
 
@@ -54,19 +55,19 @@ namespace Yueby.EditorWindowExtends.HarmonyPatches
             if (_graphGUI == null) return;
             foreach (var node in _graphGUI.Graph.nodes)
             {
-                if (_nodeIgnore.Contains(node.Title)) continue;
+                if (NodeIgnore.Contains(node.Title)) continue;
 
                 var label = node.State.motion == null ? "None" : node.State.motion.name;
                 var rect = node.Position;
                 rect.y += EditorGUIUtility.singleLineHeight * 0.5f;
-                var style = GUI.skin.label;
-                style.alignment = TextAnchor.MiddleCenter;
-                var color = style.normal.textColor;
-                color.a = 0.2f;
-                style.fontStyle = FontStyle.Bold;
 
-
-                GUI.Label(rect, label, style);
+                GUI.Label(rect, label, new GUIStyle(GUI.skin.label)
+                {
+                    alignment = TextAnchor.MiddleCenter,
+                    fontSize = 10,
+                    fontStyle = FontStyle.Bold,
+                    normal = { textColor = new Color(GUI.skin.label.normal.textColor.r, GUI.skin.label.normal.textColor.g, GUI.skin.label.normal.textColor.b, 0.7f) },
+                });
             }
         }
     }
