@@ -13,7 +13,7 @@ namespace Yueby.EditorWindowExtends.AnimatorControllerToolExtends.Drawer.GraphGU
         public override void OnDrawGraphGUI(HarmonyPatches.MapperObject.GraphGUI graphGUI, StateNode stateNode)
         {
             base.OnDrawGraphGUI(graphGUI, stateNode);
-
+            if (stateNode.State == null) return;
             var label = stateNode.State.motion == null ? "None" : stateNode.State.motion.name;
             var rect = stateNode.Position;
             rect.y += EditorGUIUtility.singleLineHeight * 0.5f;
