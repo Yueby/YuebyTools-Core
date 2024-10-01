@@ -10,10 +10,9 @@ namespace Yueby.EditorWindowExtends.AnimatorControllerToolExtends
     [InitializeOnLoad]
     public class LayerControllerViewExtender : EditorExtender<LayerControllerViewExtender, LayerControllerViewDrawer>
     {
-        private const string MenuPath = BaseMenuPath + "Animator/" + nameof(LayerControllerViewExtender);
-        private static LayerControllerViewExtender _extender;
+        public override string Name => "Layer View";
+        public static LayerControllerViewExtender Instance { get; private set; }
         private static ReorderableList _lastList;
-
 
         private int _lastIndex = -1;
         public Vector2 ScrollPosition { get; private set; }
@@ -30,11 +29,11 @@ namespace Yueby.EditorWindowExtends.AnimatorControllerToolExtends
             {
                 // if (_lastList != ParameterControllerViewReflect.GetParameterReorderableList(AnimatorControllerToolHelper.Window))
                 //     _extender = null;
-                _extender ??= new LayerControllerViewExtender();
+                Instance ??= new LayerControllerViewExtender();
             }
             else
             {
-                _extender = null;
+                Instance = null;
             }
         }
 
@@ -45,8 +44,8 @@ namespace Yueby.EditorWindowExtends.AnimatorControllerToolExtends
             _lastList = LayerControllerViewReflect.GetLayerReorderableList(AnimatorControllerToolHelper.Window);
             if (_lastList == null)
             {
-                Debug.LogWarning("Can't find layer list, try recreate extender.");
-                _extender = null;
+                // Debug.LogWarning("Can't find layer list, try recreate extender.");
+                Instance = null;
                 return;
             }
 
@@ -61,7 +60,7 @@ namespace Yueby.EditorWindowExtends.AnimatorControllerToolExtends
             _lastList.drawElementBackgroundCallback += OnDrawElementBackground;
 
 
-            foreach (var drawer in Drawers)
+            foreach (var drawer in ExtenderDrawers)
             {
                 drawer.Init(this, _lastList);
             }
@@ -69,11 +68,11 @@ namespace Yueby.EditorWindowExtends.AnimatorControllerToolExtends
 
         private void OnDrawElement(Rect rect, int index, bool isactive, bool isfocused)
         {
-            if (!IsEnable) return;
+            if (!IsEnabled) return;
 
             ScrollPosition = LayerControllerViewReflect.GetLayerScrollPosition(AnimatorControllerToolHelper.Window);
 
-            foreach (var drawer in Drawers.Where(drawer => drawer.IsVisible))
+            foreach (var drawer in ExtenderDrawers.Where(drawer => drawer.IsVisible))
             {
                 drawer.OnDrawElement(rect, index, isactive, isfocused);
             }
@@ -85,9 +84,9 @@ namespace Yueby.EditorWindowExtends.AnimatorControllerToolExtends
 
         private void OnDrawElementBackground(Rect rect, int index, bool isactive, bool isfocused)
         {
-            if (!IsEnable) return;
+            if (!IsEnabled) return;
 
-            foreach (var drawer in Drawers.Where(drawer => drawer.IsVisible))
+            foreach (var drawer in ExtenderDrawers.Where(drawer => drawer.IsVisible))
             {
                 drawer.OnDrawElementBackground(rect, index, isactive, isfocused);
             }
@@ -95,9 +94,9 @@ namespace Yueby.EditorWindowExtends.AnimatorControllerToolExtends
 
         private void OnMouseUp(ReorderableList list)
         {
-            if (!IsEnable) return;
+            if (!IsEnabled) return;
 
-            foreach (var drawer in Drawers.Where(drawer => drawer.IsVisible))
+            foreach (var drawer in ExtenderDrawers.Where(drawer => drawer.IsVisible))
             {
                 drawer.OnMouseUp(list);
             }
@@ -105,9 +104,9 @@ namespace Yueby.EditorWindowExtends.AnimatorControllerToolExtends
 
         private void OnMouseDrag(ReorderableList list)
         {
-            if (!IsEnable) return;
+            if (!IsEnabled) return;
 
-            foreach (var drawer in Drawers.Where(drawer => drawer.IsVisible))
+            foreach (var drawer in ExtenderDrawers.Where(drawer => drawer.IsVisible))
             {
                 drawer.OnMouseDrag(list);
             }
@@ -115,9 +114,9 @@ namespace Yueby.EditorWindowExtends.AnimatorControllerToolExtends
 
         private void OnRemove(ReorderableList list)
         {
-            if (!IsEnable) return;
+            if (!IsEnabled) return;
 
-            foreach (var drawer in Drawers.Where(drawer => drawer.IsVisible))
+            foreach (var drawer in ExtenderDrawers.Where(drawer => drawer.IsVisible))
             {
                 drawer.OnRemove(list);
             }
@@ -125,9 +124,9 @@ namespace Yueby.EditorWindowExtends.AnimatorControllerToolExtends
 
         private void OnSelect(ReorderableList list)
         {
-            if (!IsEnable) return;
+            if (!IsEnabled) return;
 
-            foreach (var drawer in Drawers.Where(drawer => drawer.IsVisible))
+            foreach (var drawer in ExtenderDrawers.Where(drawer => drawer.IsVisible))
             {
                 drawer.OnSelect(list);
             }
@@ -135,9 +134,9 @@ namespace Yueby.EditorWindowExtends.AnimatorControllerToolExtends
 
         private void OnChanged(ReorderableList list)
         {
-            if (!IsEnable) return;
+            if (!IsEnabled) return;
 
-            foreach (var drawer in Drawers.Where(drawer => drawer.IsVisible))
+            foreach (var drawer in ExtenderDrawers.Where(drawer => drawer.IsVisible))
             {
                 drawer.OnChanged(list);
             }
@@ -145,9 +144,9 @@ namespace Yueby.EditorWindowExtends.AnimatorControllerToolExtends
 
         private void OnAdd(ReorderableList list)
         {
-            if (!IsEnable) return;
+            if (!IsEnabled) return;
 
-            foreach (var drawer in Drawers.Where(drawer => drawer.IsVisible))
+            foreach (var drawer in ExtenderDrawers.Where(drawer => drawer.IsVisible))
             {
                 drawer.OnAdd(list);
             }
@@ -157,13 +156,6 @@ namespace Yueby.EditorWindowExtends.AnimatorControllerToolExtends
         {
             base.Repaint();
             AnimatorControllerToolHelper.Window?.Repaint();
-        }
-
-
-        [MenuItem(MenuPath, false)]
-        private static void ShowOptionWindow()
-        {
-            _extender.ShowOptions();
         }
     }
 }

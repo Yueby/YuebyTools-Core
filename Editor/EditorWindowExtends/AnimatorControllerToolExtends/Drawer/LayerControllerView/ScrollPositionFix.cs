@@ -7,7 +7,7 @@ namespace Yueby.EditorWindowExtends.AnimatorControllerToolExtends.Drawer.LayerCo
     public class ScrollPositionFix : LayerControllerViewDrawer
     {
         public override string DrawerName => "Scroll Position Fix";
-        public override string ToolTip => "Fix layer delete and add scroll position";
+        public override string Tooltip => "Fix layer delete and add scroll position";
         private Vector2 _scrollPosition;
         private int _lastCount = 0;
 
@@ -33,10 +33,11 @@ namespace Yueby.EditorWindowExtends.AnimatorControllerToolExtends.Drawer.LayerCo
                     _scrollPosition.y = y;
                 }
 
-                LayerControllerViewReflect.SetLayerScrollPosition(AnimatorControllerToolHelper.Window, _scrollPosition);
 
                 _lastCount = ReorderableList.list.Count;
             }
+
+            LayerControllerViewReflect.SetLayerScrollPosition(AnimatorControllerToolHelper.Window, _scrollPosition);
         }
     }
 }

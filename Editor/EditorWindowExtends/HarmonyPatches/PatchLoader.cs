@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using HarmonyLib;
 using UnityEditor;
@@ -11,22 +12,28 @@ namespace Yueby.EditorWindowExtends.HarmonyPatches
     internal static class PatchLoader
     {
         public const string BaseMenuPath = "Tools/YuebyTools/Editor Window Extends/";
+
         private static readonly Action<Harmony>[] Patches =
         {
-            ProjectBrowserPatch.Patch ,
-             AnimatorControllerToolPatch.Patch
-         };
+            ProjectBrowserPatch.Patch,
+            AnimatorControllerToolPatch.Patch
+        };
 
         private static Harmony _harmony;
+
+        private static int _initializedCount;
 
         [InitializeOnLoadMethod]
         internal static void PrepareApplyPatches()
         {
-            EditorApplication.delayCall += async () =>
-            {
-                await Task.Delay(TimeSpan.FromSeconds(1f));
-                ApplyPatches();
-            };
+            EditorApplication.update += OnUpdate;
+        }
+
+        private static async void OnUpdate()
+        {
+            EditorApplication.update -= OnUpdate;
+            await Task.Delay(TimeSpan.FromSeconds(1f));
+            ApplyPatches();
         }
 
         internal static void ApplyPatches()
@@ -35,16 +42,21 @@ namespace Yueby.EditorWindowExtends.HarmonyPatches
             _harmony = new Harmony("yueby.tools.core");
             foreach (var patch in Patches)
             {
-                var declaringTypeName = patch.Method.DeclaringType.Name;
                 try
                 {
                     patch(_harmony);
-                    Log.Info($"{declaringTypeName} --> Applied.");
+                    _initializedCount++;
                 }
                 catch (Exception e)
                 {
                     Log.Exception(e);
+                    _initializedCount--;
                 }
+            }
+
+            if (_initializedCount == Patches.Length)
+            {
+                Log.Info("All patches applied.");
             }
 
             AssemblyReloadEvents.beforeAssemblyReload -= UnpatchAll;

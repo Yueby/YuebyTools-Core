@@ -7,7 +7,7 @@ using Yueby.ModalWindow;
 
 namespace Yueby
 {
-    public class RemoveAvatarComponent : Editor
+    public class RemoveAvatarComponent : UnityEditor.Editor
     {
         [MenuItem("Tools/YuebyTools/VRChat/Remove PhysBones In Scene")]
         public static void StartRemove()

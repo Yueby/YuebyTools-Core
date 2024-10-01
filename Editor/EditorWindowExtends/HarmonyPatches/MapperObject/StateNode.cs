@@ -2,7 +2,7 @@ using UnityEditor.Animations;
 using UnityEngine;
 using Yueby.Utils.Reflections;
 
-namespace Yueby.EditorWindowExtends.HarmonyPatches.Mapper
+namespace Yueby.EditorWindowExtends.HarmonyPatches.MapperObject
 {
     [MappingClass]
     public class StateNode : Object

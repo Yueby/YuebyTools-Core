@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Yueby.Utils.Reflections;
 
-namespace Yueby.EditorWindowExtends.HarmonyPatches.Mapper
+namespace Yueby.EditorWindowExtends.HarmonyPatches.MapperObject
 {
     [MappingClass]
     [Serializable]

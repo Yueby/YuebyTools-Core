@@ -13,7 +13,8 @@ namespace Yueby.EditorWindowExtends.ProjectBrowserExtends
     public sealed class ProjectBrowserExtender
         : EditorExtender<ProjectBrowserExtender, ProjectBrowserDrawer>
     {
-        private const string MenuPath = BaseMenuPath + nameof(ProjectBrowserExtender);
+        public override string Name => "ProjectWindow";
+
         public const float RightOffset = 2f;
         private Dictionary<string, AssetItem> _assetItems;
 
@@ -21,7 +22,7 @@ namespace Yueby.EditorWindowExtends.ProjectBrowserExtends
         private string _lastHoveredGuid;
         private bool _isDirty;
 
-        public static readonly ProjectBrowserExtender Instance;
+        public static ProjectBrowserExtender Instance { get; private set; }
 
         static ProjectBrowserExtender()
         {
@@ -30,16 +31,11 @@ namespace Yueby.EditorWindowExtends.ProjectBrowserExtends
 
         public ProjectBrowserExtender()
         {
-            SetExtenderEnable(IsEnable);
+            SetEnable(IsEnabled);
         }
 
-        [MenuItem(MenuPath, false)]
-        private static void ShowOptionWindow()
-        {
-            Instance.ShowOptions();
-        }
 
-        public override void SetExtenderEnable(bool value)
+        public override void SetEnable(bool value)
         {
             if (!value)
             {
@@ -55,7 +51,7 @@ namespace Yueby.EditorWindowExtends.ProjectBrowserExtends
                 EditorApplication.update += OnUpdate;
             }
 
-            base.SetExtenderEnable(value);
+            base.SetEnable(value);
         }
 
         private void OnUpdate()
@@ -66,11 +62,11 @@ namespace Yueby.EditorWindowExtends.ProjectBrowserExtends
 
         public static void OnProjectBrowserObjectAreaItemGUI(int instanceID, Rect rect)
         {
-            if (!Instance.IsEnable)
+            if (!Instance.IsEnabled)
                 return;
 
             var guid = AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(instanceID));
-            if (Instance is { Drawers: null })
+            if (Instance is { ExtenderDrawers: null })
                 return;
 
             Instance.CheckRepaintAndDoGUI(
@@ -79,7 +75,7 @@ namespace Yueby.EditorWindowExtends.ProjectBrowserExtends
                 (assetItem) =>
                 {
                     foreach (
-                        var drawer in Instance.Drawers.Where(drawer =>
+                        var drawer in Instance.ExtenderDrawers.Where(drawer =>
                             drawer is { IsVisible: true }
                         )
                     )
@@ -97,11 +93,11 @@ namespace Yueby.EditorWindowExtends.ProjectBrowserExtends
             TreeViewItem item
         )
         {
-            if (!Instance.IsEnable)
+            if (!Instance.IsEnabled)
                 return;
 
             var guid = AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(instanceID));
-            if (Instance is { Drawers: null })
+            if (Instance is { ExtenderDrawers: null })
                 return;
 
             Instance.CheckRepaintAndDoGUI(
@@ -110,7 +106,7 @@ namespace Yueby.EditorWindowExtends.ProjectBrowserExtends
                 (assetItem) =>
                 {
                     foreach (
-                        var drawer in Instance.Drawers.Where(drawer =>
+                        var drawer in Instance.ExtenderDrawers.Where(drawer =>
                             drawer is { IsVisible: true }
                         )
                     )
@@ -129,7 +125,7 @@ namespace Yueby.EditorWindowExtends.ProjectBrowserExtends
                 rect,
                 (assetItem) =>
                 {
-                    foreach (var drawer in Drawers.Where(drawer => drawer is { IsVisible: true }))
+                    foreach (var drawer in ExtenderDrawers.Where(drawer => drawer is { IsVisible: true }))
                     {
                         drawer.OnProjectBrowserGUI(assetItem);
                     }
@@ -139,7 +135,7 @@ namespace Yueby.EditorWindowExtends.ProjectBrowserExtends
 
         private void CheckRepaintAndDoGUI(string guid, Rect rect, Action<AssetItem> callback)
         {
-            if (Drawers == null)
+            if (ExtenderDrawers == null)
                 return;
 
             // SetDirty();

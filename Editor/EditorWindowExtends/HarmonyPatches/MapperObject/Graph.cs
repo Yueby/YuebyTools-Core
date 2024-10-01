@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEditor.Graphs;
 using Yueby.Utils.Reflections;
 
-namespace Yueby.EditorWindowExtends.HarmonyPatches.Mapper
+namespace Yueby.EditorWindowExtends.HarmonyPatches.MapperObject
 {
 
     [MappingClass]

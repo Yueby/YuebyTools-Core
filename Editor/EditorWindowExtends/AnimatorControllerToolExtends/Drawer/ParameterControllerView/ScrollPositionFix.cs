@@ -8,7 +8,7 @@ namespace Yueby.EditorWindowExtends.AnimatorControllerToolExtends.Drawer.Paramet
     public class ScrollPositionFix : ParameterControllerViewDrawer
     {
         public override string DrawerName => "Scroll Position Fix";
-        public override string ToolTip => "Fix parameter delete and add scroll position";
+        public override string Tooltip => "Fix parameter delete and add scroll position";
         private Vector2 _scrollPosition;
         private int _lastCount = 0;
 

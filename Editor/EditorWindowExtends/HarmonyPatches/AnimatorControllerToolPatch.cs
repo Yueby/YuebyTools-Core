@@ -1,13 +1,15 @@
+using System;
 using System.Collections.Generic;
+using System.Reflection;
+using System.Threading.Tasks;
 using HarmonyLib;
 using UnityEditor;
-using UnityEditor.Animations;
 using UnityEngine;
+using Yueby.EditorWindowExtends.AnimatorControllerToolExtends;
 using Yueby.EditorWindowExtends.AnimatorControllerToolExtends.Reflections;
-using Yueby.EditorWindowExtends.HarmonyPatches.Mapper;
+using Yueby.EditorWindowExtends.HarmonyPatches.MapperObject;
 using Yueby.Utils.Reflections;
 using YuebyTools.Core.Utils;
-using GraphGUI = Yueby.EditorWindowExtends.HarmonyPatches.Mapper.GraphGUI;
 using Object = UnityEngine.Object;
 
 namespace Yueby.EditorWindowExtends.HarmonyPatches
@@ -16,6 +18,11 @@ namespace Yueby.EditorWindowExtends.HarmonyPatches
     {
         private static Dictionary<int, StateNode> _stateNodeCaches = new();
         private static GraphGUI _graphGUI;
+
+        private static Harmony _harmony;
+        private static MethodInfo _animatorControllerToolOnGUIMethod = AnimatorControllerToolReflect.Type.Method("OnGUI");
+
+        public static event Action<GraphGUI, StateNode> OnDrawStateNode;
 
         private static readonly List<string> NodeIgnore = new()
         {
@@ -27,17 +34,14 @@ namespace Yueby.EditorWindowExtends.HarmonyPatches
 
         internal static void Patch(Harmony harmony)
         {
-            var nodeUIMethodPrefix = AccessTools.Method(typeof(AnimatorControllerToolPatch), nameof(OnGraphGUIPrefix));
-            var nodeUIMethodPostfix = AccessTools.Method(typeof(AnimatorControllerToolPatch), nameof(OnGraphGUIPostfix));
+            _harmony = harmony;
 
-            harmony.Patch(AnimatorControllerToolReflect.GraphGUIType.Method("OnGraphGUI"), new HarmonyMethod(nodeUIMethodPrefix), new HarmonyMethod(nodeUIMethodPostfix));
+            // GraphGUI - OnGraphGUI
+            var onGraphGUIMethodPrefix = AccessTools.Method(typeof(AnimatorControllerToolPatch), nameof(OnGraphGUIPrefix));
+            var onGraphGUIMethodPostfix = AccessTools.Method(typeof(AnimatorControllerToolPatch), nameof(OnGraphGUIPostfix));
+
+            harmony.Patch(AnimatorControllerToolReflect.GraphGUIType.Method("OnGraphGUI"), new HarmonyMethod(onGraphGUIMethodPrefix), new HarmonyMethod(onGraphGUIMethodPostfix));
         }
-
-        // private static bool DrawEdge(object __instance, Edge edge, Texture2D tex, Color color, object info, bool viewHasLiveLinkExactEdge)
-        // {
-        //     Log.Info(edge.toSlotName);
-        //     return true;
-        // }
 
 
         private static void OnGraphGUIPrefix(Object __instance)
@@ -45,8 +49,7 @@ namespace Yueby.EditorWindowExtends.HarmonyPatches
             if (__instance == null)
                 return;
 
-            _graphGUI = ReflectionUtil.Map<GraphGUI>(__instance);
-
+            _graphGUI = Mapper.Map<GraphGUI>(__instance);
             // Log.Info(JsonUtility.ToJson(graphGUI), __instance.GetInstanceID(), "|", graphGUI.Name, graphGUI.Graph.nodes.Count);
         }
 
@@ -57,17 +60,7 @@ namespace Yueby.EditorWindowExtends.HarmonyPatches
             {
                 if (NodeIgnore.Contains(node.Title)) continue;
 
-                var label = node.State.motion == null ? "None" : node.State.motion.name;
-                var rect = node.Position;
-                rect.y += EditorGUIUtility.singleLineHeight * 0.5f;
-
-                GUI.Label(rect, label, new GUIStyle(GUI.skin.label)
-                {
-                    alignment = TextAnchor.MiddleCenter,
-                    fontSize = 10,
-                    fontStyle = FontStyle.Bold,
-                    normal = { textColor = new Color(GUI.skin.label.normal.textColor.r, GUI.skin.label.normal.textColor.g, GUI.skin.label.normal.textColor.b, 0.7f) },
-                });
+                GraphGUIExtender.OnDrawStateNode(_graphGUI, node);
             }
         }
     }

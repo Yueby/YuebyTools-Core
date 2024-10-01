@@ -120,7 +120,7 @@ namespace Yueby.Utils
             OnChangeAnimBoolTarget?.Invoke(AnimBool.target);
         }
 
-        public void DoLayoutList(string title, Vector2 area, bool isNoBorder = false, bool hasFoldout = true, bool allowDrop = true, UnityAction<Object[]> onDropped = null, UnityAction repaint = null)
+        public void DoLayout(string title, Vector2 area, bool isNoBorder = false, bool hasFoldout = true, bool allowDrop = true, UnityAction<Object[]> onDropped = null, UnityAction repaint = null)
         {
             var listRect = new Rect();
             var maxWidth = area.x;
@@ -204,34 +204,122 @@ namespace Yueby.Utils
             }
         }
 
-        private void DrawContent(UnityAction titleDraw = null)
+        public void DoLayout(string title, bool isNoBorder = false, bool hasFoldout = true, bool allowDrop = true, bool drawCount = true, UnityAction<Object[]> onDropped = null, UnityAction repaint = null)
         {
-            EditorUI.SpaceArea(() =>
+            var listRect = new Rect();
+
+
+            if (hasFoldout)
             {
-                // 绘制标题头
-                EditorUI.HorizontalEGL(() =>
+                ChangeAnimBool(EditorGUILayout.Foldout(AnimBool.target, title));
+
+                _foldoutRect = GUILayoutUtility.GetLastRect();
+
+                if (EditorGUILayout.BeginFadeGroup(AnimBool.faded))
+                {
+                    EditorUI.HorizontalEGL(() =>
+                    {
+                        if (isNoBorder)
+                            EditorUI.VerticalEGL(() => { DrawContent(OnDrawTitle, false, false); });
+                        else
+                            EditorUI.VerticalEGL("Badge", () => { DrawContent(OnDrawTitle, false, false); });
+                        // EditorGUILayout.Space(5);
+                    });
+                    listRect = GUILayoutUtility.GetLastRect();
+                }
+
+                EditorGUILayout.EndFadeGroup();
+            }
+            else
+            {
+                EditorUI.VerticalEGL(() =>
+                {
+                    if (!string.IsNullOrEmpty(title))
+                        EditorUI.TitleLabelField(title);
+
+                    if (isNoBorder)
+                        EditorUI.VerticalEGL(() => { DrawContent(OnDrawTitle, false, false); });
+                    else
+                        EditorUI.VerticalEGL("Badge", () => { DrawContent(OnDrawTitle, false, false); });
+                    // EditorGUILayout.Space(5);
+                });
+                listRect = GUILayoutUtility.GetLastRect();
+            }
+
+            if (!allowDrop) return;
+
+            if (!AnimBool.target)
+            {
+                if (Event.current.type == EventType.DragUpdated && _foldoutRect.Contains(Event.current.mousePosition))
+                    ChangeAnimBool(true);
+
+                return;
+            }
+
+            if (_isEnterListArea)
+            {
+                var label = "↓";
+                if (_dropRect.Contains(Event.current.mousePosition))
+                {
+                    label = "";
+                    DragAndDrop.visualMode = DragAndDropVisualMode.Copy;
+                }
+
+                GUI.Box(_dropRect, label);
+            }
+
+            if (Event.current.type == EventType.DragUpdated)
+            {
+                _isEnterListArea = listRect.Contains(Event.current.mousePosition);
+                repaint?.Invoke();
+            }
+            else if (Event.current.type == EventType.DragExited)
+            {
+                _isEnterListArea = false;
+                if (_dropRect.Contains(Event.current.mousePosition))
+                {
+                    DragAndDrop.AcceptDrag();
+
+                    onDropped?.Invoke(DragAndDrop.objectReferences);
+                    Array.Resize(ref ElementHeights, _elements.Count);
+                    repaint?.Invoke();
+                }
+            }
+        }
+
+        private void DrawContent(UnityAction titleDraw = null, bool hasScroll = true, bool drawCount = true)
+        {
+            // 绘制标题头
+            EditorUI.HorizontalEGL(() =>
+            {
+                if (drawCount)
                 {
                     EditorUI.HorizontalEGL("Badge", () =>
                     {
                         EditorGUILayout.LabelField($"{List.count}", EditorStyles.centeredGreyMiniLabel,
                             GUILayout.Width(25), GUILayout.Height(18));
                     }, GUILayout.Width(25), GUILayout.Height(18));
-
                     EditorGUILayout.Space();
-                    titleDraw?.Invoke();
-                    if (_isShowAddButton && GUILayout.Button("+", GUILayout.Width(25), GUILayout.Height(18)))
-                        //添加
-                        List.onAddCallback?.Invoke(List);
+                }
 
-                    EditorGUI.BeginDisabledGroup(List.count == 0 || List.index == -1);
-                    if (_isShowRemoveButton && GUILayout.Button("-", GUILayout.Width(25), GUILayout.Height(18))) List.onRemoveCallback?.Invoke(List);
 
-                    EditorGUI.EndDisabledGroup();
-                });
-                _dropRect = GUILayoutUtility.GetLastRect();
+                titleDraw?.Invoke();
+                if (_isShowAddButton && GUILayout.Button("+", GUILayout.Width(25), GUILayout.Height(18)))
+                    //添加
+                    List.onAddCallback?.Invoke(List);
 
-                EditorUI.Line(LineType.Horizontal, 2, 0);
-                // 绘制列表内容
+                EditorGUI.BeginDisabledGroup(List.count == 0 || List.index == -1);
+                if (_isShowRemoveButton && GUILayout.Button("-", GUILayout.Width(25), GUILayout.Height(18))) List.onRemoveCallback?.Invoke(List);
+
+                EditorGUI.EndDisabledGroup();
+            });
+            _dropRect = GUILayoutUtility.GetLastRect();
+
+            EditorUI.Line(LineType.Horizontal, 2, 0);
+            // 绘制列表内容
+
+            if (hasScroll)
+            {
                 _scrollPos = EditorUI.ScrollViewEGL(() =>
                 {
                     if (List.count == 0)
@@ -239,7 +327,14 @@ namespace Yueby.Utils
                     else
                         List?.DoLayoutList();
                 }, _scrollPos);
-            });
+            }
+            else
+            {
+                if (List.count == 0)
+                    EditorGUILayout.HelpBox("List is null!", MessageType.Info);
+                else
+                    List?.DoLayoutList();
+            }
         }
     }
 }

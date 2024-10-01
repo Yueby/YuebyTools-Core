@@ -1,9 +1,10 @@
-﻿using UnityEditor;
+﻿using Editor.EditorWindowExtends.Core;
+using UnityEditor;
 using Yueby.Core;
 
 namespace Yueby.EditorWindowExtends.Core
 {
-    public class EditorExtenderDrawer<TExtender, TDrawer>
+    public class EditorExtenderDrawer<TExtender, TDrawer> : IEditorExtenderDrawer
         where TExtender : EditorExtender<TExtender, TDrawer>, new()
         where TDrawer : EditorExtenderDrawer<TExtender, TDrawer>, new()
     {
@@ -14,34 +15,54 @@ namespace Yueby.EditorWindowExtends.Core
         public virtual TExtender Extender { get; set; }
 
         public string SavePath => $"{GetType().FullName}";
-        public bool IsVisible => EditorPrefs.GetBool($"{SavePath}.IsVisible", true);
-        public  int Order => EditorPrefs.GetInt($"{SavePath}.Order", 0);
+
+        public bool IsVisible
+        {
+            get
+            {
+                var isVisible = EditorPrefs.GetBool($"{SavePath}.IsVisible", true);
+                IsVisibleProperty.Value = isVisible;
+                return isVisible;
+            }
+        }
+
+        public int Order
+        {
+            get
+            {
+                var order = EditorPrefs.GetInt($"{SavePath}.Order", 0);
+                OrderProperty.Value = order;
+                return order;
+            }
+        }
+
         public virtual string DrawerName { get; } = "";
-        public virtual string ToolTip { get; } = "";
+        public virtual string Tooltip { get; } = "";
 
         public EditorExtenderDrawer()
         {
             DrawerName = GetType().Name;
-            IsVisibleProperty.ValueChanged += OnVisiblePropertyChanged;
-            OrderProperty.ValueChanged += OnOrderPropertyChanged;
         }
 
         // 修改 Init 方法
         public virtual void Init(TExtender extender)
         {
             Extender = extender;
+            IsVisibleProperty.ValueChanged += OnVisiblePropertyChanged;
+            OrderProperty.ValueChanged += OnOrderPropertyChanged;
         }
 
-        protected virtual void OnOrderPropertyChanged(int value)
+
+        public virtual void OnOrderPropertyChanged(int value)
         {
             EditorPrefs.SetInt($"{SavePath}.Order", value);
-            EditorApplication.RepaintProjectWindow();
+            Repaint();
         }
 
-        protected virtual void OnVisiblePropertyChanged(bool value)
+        public virtual void OnVisiblePropertyChanged(bool value)
         {
             EditorPrefs.SetBool($"{SavePath}.IsVisible", value);
-            EditorApplication.RepaintProjectWindow();
+            Repaint();
         }
 
         public void ChangeVisible(bool value)
