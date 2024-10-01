@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using UnityEditor;
+using UnityEditor.Compilation;
 using UnityEngine;
 using Yueby.EditorWindowExtends.AnimatorControllerToolExtends;
 using Yueby.EditorWindowExtends.Core;
@@ -18,12 +19,18 @@ namespace Yueby.EditorWindowExtends
 
         private static Vector2 _scrollPos;
 
-        [MenuItem("Tools/YuebyTools/Editor Extender")]
+        [MenuItem("Tools/YuebyTools/Editor Extender/Options")]
         private static void OpenWindow()
         {
             _window = GetWindow<ExtenderOptionWindow>();
             _window.titleContent = new GUIContent("EditorExtenderOptions");
             _window.minSize = new Vector2(300, 400);
+        }
+
+        [MenuItem("Tools/YuebyTools/Editor Extender/Recompile Scripts")]
+        private static void ReCompile()
+        {
+            CompilationPipeline.RequestScriptCompilation();
         }
 
         private void OnEnable()
