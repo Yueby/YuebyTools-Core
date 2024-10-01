@@ -7,6 +7,9 @@ namespace Yueby.EditorWindowExtends.AnimatorControllerToolExtends.Drawer.GraphGU
 {
     public class MotionNameDrawer : GraphGUIDrawer
     {
+        public override string DrawerName => "Display Motion Name";
+        public override string Tooltip => "Display the name of the motion in the state node";
+
         public override void OnDrawGraphGUI(HarmonyPatches.MapperObject.GraphGUI graphGUI, StateNode stateNode)
         {
             base.OnDrawGraphGUI(graphGUI, stateNode);

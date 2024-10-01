@@ -7,10 +7,11 @@ namespace Yueby.EditorWindowExtends.AnimatorControllerToolExtends.Drawer.LayerCo
 {
     public class IndexDrawer : LayerControllerViewDrawer
     {
-        public override string DrawerName => "Index Label";
+        private GUIStyle _indexLabelStyleGray;
 
         private GUIStyle _indexLabelStyleWhite;
-        private GUIStyle _indexLabelStyleGray;
+        public override string DrawerName => "Index Label";
+        public override string Tooltip => "Draw the index of the layer in the list.";
 
         public override void OnDrawElement(Rect rect, int index, bool isactive, bool isfocused)
         {
@@ -33,7 +34,7 @@ namespace Yueby.EditorWindowExtends.AnimatorControllerToolExtends.Drawer.LayerCo
             _indexLabelStyleWhite ??= new GUIStyle(GUI.skin.label)
             {
                 richText = true,
-                alignment = TextAnchor.MiddleLeft,
+                alignment = TextAnchor.MiddleLeft
             };
 
 

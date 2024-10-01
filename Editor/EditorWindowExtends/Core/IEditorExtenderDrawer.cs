@@ -1,4 +1,4 @@
-﻿namespace Editor.EditorWindowExtends.Core
+﻿namespace Yueby.EditorWindowExtends.Core
 {
     public interface IEditorExtenderDrawer
     {

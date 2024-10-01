@@ -1,6 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using Editor.EditorWindowExtends.Core;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
 using Yueby.EditorWindowExtends.AnimatorControllerToolExtends;
@@ -57,31 +57,40 @@ namespace Yueby.EditorWindowExtends
     {
         public ReorderableListDroppable List;
         public IEditorExtender Extender;
+        private int _clickedIndex;
 
         public ExtenderOptionHandler(IEditorExtender extender)
         {
-            List = SetupList(extender.Drawers);
             Extender = extender;
+            List = SetupList(extender);
         }
 
 
-        private ReorderableListDroppable SetupList(List<IEditorExtenderDrawer> data)
+        private ReorderableListDroppable SetupList(IEditorExtender extender)
         {
-            Log.Info(data.Count);
-            return new ReorderableListDroppable(data, typeof(IEditorExtenderDrawer), EditorGUIUtility.singleLineHeight, null, false, false)
+            return new ReorderableListDroppable(extender.Drawers, typeof(IEditorExtenderDrawer), EditorGUIUtility.singleLineHeight, null, false, false)
             {
                 OnDraw = OnListDraw,
                 OnChanged = OnListChanged,
             };
         }
 
-        private void OnListChanged(int index)
+        private async void OnListChanged(int index)
         {
-            Extender.Drawers[index].ChangeOrder(index);
+            Extender.Drawers[index].ChangeOrder(_clickedIndex);
+            Extender.Drawers[_clickedIndex].ChangeOrder(index);
+
+
+            Extender.Drawers = Extender.Drawers;
         }
 
         private float OnListDraw(Rect rect, int index, bool arg3, bool arg4)
         {
+            if (Event.current.type == EventType.MouseDown && rect.Contains(Event.current.mousePosition))
+            {
+                _clickedIndex = index;
+            }
+
             var singleLineHeight = EditorGUIUtility.singleLineHeight;
             var toggleRect = new Rect(rect.x, rect.y, singleLineHeight, singleLineHeight);
             var labelRect = new Rect(rect.x + singleLineHeight, rect.y, rect.width - singleLineHeight, singleLineHeight);
@@ -90,6 +99,8 @@ namespace Yueby.EditorWindowExtends
             item.ChangeVisible(EditorGUI.Toggle(toggleRect, item.IsVisible));
 
             EditorGUI.LabelField(labelRect, new GUIContent(item.DrawerName, item.Tooltip));
+
+            EditorGUI.LabelField(new Rect(rect.x + rect.width - singleLineHeight, rect.y, 20, singleLineHeight), item.Order.ToString());
             return singleLineHeight;
         }
 

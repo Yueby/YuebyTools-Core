@@ -18,8 +18,14 @@ namespace Yueby.EditorWindowExtends.Reflections
         public static FieldInfo HoveredItemBackgroundStyle => Type.GetField("hoveredItemBackgroundStyle", ReflectionHelper.StaticLookup);
         public static FieldInfo HoveredBackgroundColor => Type.GetField("hoveredBackgroundColor", ReflectionHelper.StaticLookup);
 
-        public static GUIStyle GetHoveredItemBackgroundStyle() => (GUIStyle)HoveredItemBackgroundStyle.GetValue(null);
+        public static GUIStyle GetHoveredItemBackgroundStyle()
+        {
+            return (GUIStyle)HoveredItemBackgroundStyle.GetValue(null);
+        }
 
-        public static Color GetHoveredBackgroundColor() => (Color)HoveredBackgroundColor.GetValue(null);
+        public static Color GetHoveredBackgroundColor()
+        {
+            return (Color)HoveredBackgroundColor.GetValue(null);
+        }
     }
 }

@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using Editor.EditorWindowExtends.Core;
 using UnityEditor;
-using YuebyTools.Core.Utils;
 
 namespace Yueby.EditorWindowExtends.Core
 {
@@ -15,8 +13,17 @@ namespace Yueby.EditorWindowExtends.Core
 
         public List<IEditorExtenderDrawer> Drawers
         {
-            get => ExtenderDrawers.ConvertAll(drawer => (IEditorExtenderDrawer)drawer);
-            set { ExtenderDrawers = value.ConvertAll(drawer => (TDrawer)drawer); }
+            get
+            {
+                var result = ExtenderDrawers.ConvertAll(drawer => (IEditorExtenderDrawer)drawer);
+
+                return result;
+            }
+            set
+            {
+                ExtenderDrawers = value.ConvertAll(drawer => (TDrawer)drawer);
+                SortByIndex();
+            }
         }
 
         // protected readonly ExtenderOptionModalWindowDrawer<TExtender, TDrawer> OptionModalDrawer;
@@ -38,7 +45,6 @@ namespace Yueby.EditorWindowExtends.Core
 
         protected EditorExtender() // 注意构造函数名称
         {
-            
             foreach (var drawerType in GetAllDrawerTypes())
             {
                 var drawer = (TDrawer)Activator.CreateInstance(drawerType);
@@ -48,8 +54,17 @@ namespace Yueby.EditorWindowExtends.Core
                 ExtenderDrawers.Add(drawer);
             }
 
-            ExtenderDrawers.Sort((a, b) => a.Order.CompareTo(b.Order));
+            SortByIndex();
             // OptionModalDrawer = new ExtenderOptionModalWindowDrawer<TExtender, TDrawer>(ExtenderDrawers, this);
+        }
+
+        private void SortByIndex()
+        {
+            ExtenderDrawers.Sort((a, b) => a.Order.CompareTo(b.Order));
+            for (var i = 0; i < ExtenderDrawers.Count; i++)
+            {
+                ExtenderDrawers[i].ChangeOrder(i);
+            }
         }
 
 
@@ -79,6 +94,14 @@ namespace Yueby.EditorWindowExtends.Core
         public virtual void Repaint()
         {
         }
+
+        public List<TDrawer> GetOrderedDrawers()
+        {
+            var drawers = ExtenderDrawers;
+            drawers.Sort((a, b) => a.Order.CompareTo(b.Order));
+            return drawers;
+        }
+
 
         // protected virtual void ShowOptions()
         // {

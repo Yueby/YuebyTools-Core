@@ -1,9 +1,7 @@
-﻿using System;
-using HarmonyLib;
+﻿using HarmonyLib;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 using Yueby.EditorWindowExtends.ProjectBrowserExtends;
-using Object = UnityEngine.Object;
 
 namespace Yueby.EditorWindowExtends.HarmonyPatches
 {
@@ -20,7 +18,7 @@ namespace Yueby.EditorWindowExtends.HarmonyPatches
                 typeof(TreeViewItem),
                 typeof(bool),
                 typeof(bool),
-                typeof(bool),
+                typeof(bool)
             }), new HarmonyMethod(onDoItemGUIMethod));
 
 

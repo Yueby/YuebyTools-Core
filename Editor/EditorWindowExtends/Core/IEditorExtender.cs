@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
 
-namespace Editor.EditorWindowExtends.Core
+namespace Yueby.EditorWindowExtends.Core
 {
     public interface IEditorExtender
     {
         string Name { get; }
         bool IsEnabled { get; }
+        List<IEditorExtenderDrawer> Drawers { get; set; }
         void SetEnable(bool value);
-        List<IEditorExtenderDrawer> Drawers { get; }
     }
 }

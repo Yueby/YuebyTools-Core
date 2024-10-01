@@ -1,15 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Threading.Tasks;
 using HarmonyLib;
-using UnityEditor;
-using UnityEngine;
 using Yueby.EditorWindowExtends.AnimatorControllerToolExtends;
 using Yueby.EditorWindowExtends.AnimatorControllerToolExtends.Reflections;
 using Yueby.EditorWindowExtends.HarmonyPatches.MapperObject;
 using Yueby.Utils.Reflections;
-using YuebyTools.Core.Utils;
 using Object = UnityEngine.Object;
 
 namespace Yueby.EditorWindowExtends.HarmonyPatches

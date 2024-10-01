@@ -10,6 +10,7 @@ namespace Yueby.EditorWindowExtends.ProjectBrowserExtends.Drawer
     public class HoverDrawer : ProjectBrowserDrawer
     {
         public override string DrawerName => "Hover Background";
+        public override string Tooltip => "Draw a background when hovering over an item in the project browser.";
         private Rect _hoverRect;
         private bool _isDown;
         private AssetItem _lastHoverItem;
@@ -62,8 +63,8 @@ namespace Yueby.EditorWindowExtends.ProjectBrowserExtends.Drawer
             rect = ExpandRect(
                 rect,
                 _isDown ? 4
-                    : item.OriginRect.height > EditorGUIUtility.singleLineHeight ? 2
-                    : 0
+                : item.OriginRect.height > EditorGUIUtility.singleLineHeight ? 2
+                : 0
             );
 
             var color = GameObjectStylesReflect.GetHoveredBackgroundColor();

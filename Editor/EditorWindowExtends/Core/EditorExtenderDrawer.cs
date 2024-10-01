@@ -1,6 +1,6 @@
-﻿using Editor.EditorWindowExtends.Core;
-using UnityEditor;
+﻿using UnityEditor;
 using Yueby.Core;
+using YuebyTools.Core.Utils;
 
 namespace Yueby.EditorWindowExtends.Core
 {
@@ -30,12 +30,13 @@ namespace Yueby.EditorWindowExtends.Core
         {
             get
             {
-                var order = EditorPrefs.GetInt($"{SavePath}.Order", 0);
+                var order = EditorPrefs.GetInt($"{SavePath}.Order", DefaultOrder);
                 OrderProperty.Value = order;
                 return order;
             }
         }
 
+        public virtual int DefaultOrder { get; } = 0;
         public virtual string DrawerName { get; } = "";
         public virtual string Tooltip { get; } = "";
 
@@ -56,6 +57,7 @@ namespace Yueby.EditorWindowExtends.Core
         public virtual void OnOrderPropertyChanged(int value)
         {
             EditorPrefs.SetInt($"{SavePath}.Order", value);
+
             Repaint();
         }
 

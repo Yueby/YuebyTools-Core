@@ -1,15 +1,14 @@
-using System;
 using UnityEditor;
 using UnityEngine;
 using Yueby.EditorWindowExtends.ProjectBrowserExtends.Core;
-using YuebyTools.Core.Utils;
-using Object = UnityEngine.Object;
 
 namespace Yueby.EditorWindowExtends.ProjectBrowserExtends.Drawer
 {
     public class NewAssetDrawer : ProjectBrowserDrawer
     {
         public override string DrawerName => "New Asset Dot";
+        public override string Tooltip => "Create a new asset in the project browser";
+        public override int DefaultOrder => 2;
 
         public override void OnProjectBrowserGUI(AssetItem item)
         {
@@ -33,7 +32,7 @@ namespace Yueby.EditorWindowExtends.ProjectBrowserExtends.Drawer
             {
                 fontSize = 10,
                 fontStyle = FontStyle.Bold,
-                normal = { textColor = Color.green },
+                normal = { textColor = Color.green }
             };
 
             GUI.Label(dotRect, new GUIContent("●"), dotStyle);
@@ -41,22 +40,14 @@ namespace Yueby.EditorWindowExtends.ProjectBrowserExtends.Drawer
             if (!item.IsHover)
                 return;
 
-            if (item.ProjectBrowserAsset.IsNewAsset && Event.current.type == EventType.MouseDown)
-            {
-                item.ProjectBrowserAsset.SetNewAsset(false);
-            }
+            if (item.ProjectBrowserAsset.IsNewAsset && Event.current.type == EventType.MouseDown) item.ProjectBrowserAsset.SetNewAsset(false);
 
             if (!item.IsFolder) return;
             var content = EditorGUIUtility.IconContent(
                 EditorGUIUtility.isProSkin ? "d_Package Manager" : "Package Manager"
             );
             content.tooltip = "Clear New Asset Dot";
-            DrawIconButton(item, () =>
-            {
-                ClearDot(item.ProjectBrowserAsset);
-            }, content);
-
-
+            DrawIconButton(item, () => { ClearDot(item.ProjectBrowserAsset); }, content);
         }
 
         private void ClearDot(ProjectBrowserAsset asset)

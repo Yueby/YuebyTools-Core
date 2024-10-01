@@ -11,31 +11,14 @@ namespace Yueby.EditorWindowExtends.AnimatorControllerToolExtends
     [InitializeOnLoad]
     public class ParameterControllerViewExtender : EditorExtender<ParameterControllerViewExtender, ParameterControllerViewDrawer>
     {
-        public override string Name => "Parameter View";
-        public static ParameterControllerViewExtender Instance { get; private set; }
         private static ReorderableList _lastList;
 
         private int _lastIndex = -1;
-        public Vector2 ScrollPosition { get; private set; }
 
 
         static ParameterControllerViewExtender()
         {
             AnimatorControllerToolHelper.OnAnimatorControllerToolState += OnAnimatorControllerToolState;
-        }
-
-        private static void OnAnimatorControllerToolState(bool state)
-        {
-            if (state)
-            {
-                if (_lastList != ParameterControllerViewReflect.GetParameterReorderableList(AnimatorControllerToolHelper.Window))
-                    Instance = null;
-                Instance ??= new ParameterControllerViewExtender();
-            }
-            else
-            {
-                Instance = null;
-            }
         }
 
         public ParameterControllerViewExtender()
@@ -61,9 +44,24 @@ namespace Yueby.EditorWindowExtends.AnimatorControllerToolExtends
             _lastList.drawElementBackgroundCallback += OnDrawElementBackground;
 
 
-            foreach (var drawer in ExtenderDrawers)
+            foreach (var drawer in ExtenderDrawers) drawer.Init(this, _lastList);
+        }
+
+        public override string Name => "Parameter View";
+        public static ParameterControllerViewExtender Instance { get; private set; }
+        public Vector2 ScrollPosition { get; private set; }
+
+        private static void OnAnimatorControllerToolState(bool state)
+        {
+            if (state)
             {
-                drawer.Init(this, _lastList);
+                if (_lastList != ParameterControllerViewReflect.GetParameterReorderableList(AnimatorControllerToolHelper.Window))
+                    Instance = null;
+                Instance ??= new ParameterControllerViewExtender();
+            }
+            else
+            {
+                Instance = null;
             }
         }
 
@@ -73,10 +71,7 @@ namespace Yueby.EditorWindowExtends.AnimatorControllerToolExtends
 
             ScrollPosition = ParameterControllerViewReflect.GetParameterScrollPosition(AnimatorControllerToolHelper.Window);
 
-            foreach (var drawer in ExtenderDrawers.Where(drawer => drawer.IsVisible))
-            {
-                drawer.OnDrawElement(rect, index, isactive, isfocused);
-            }
+            foreach (var drawer in ExtenderDrawers.Where(drawer => drawer.IsVisible)) drawer.OnDrawElement(rect, index, isactive, isfocused);
 
             if (_lastIndex == index) return;
             _lastIndex = index;
@@ -88,70 +83,49 @@ namespace Yueby.EditorWindowExtends.AnimatorControllerToolExtends
         {
             if (!IsEnabled) return;
 
-            foreach (var drawer in ExtenderDrawers.Where(drawer => drawer.IsVisible))
-            {
-                drawer.OnDrawElementBackground(rect, index, isactive, isfocused);
-            }
+            foreach (var drawer in ExtenderDrawers.Where(drawer => drawer.IsVisible)) drawer.OnDrawElementBackground(rect, index, isactive, isfocused);
         }
 
         private void OnMouseUp(ReorderableList list)
         {
             if (!IsEnabled) return;
 
-            foreach (var drawer in ExtenderDrawers.Where(drawer => drawer.IsVisible))
-            {
-                drawer.OnMouseUp(list);
-            }
+            foreach (var drawer in ExtenderDrawers.Where(drawer => drawer.IsVisible)) drawer.OnMouseUp(list);
         }
 
         private void OnMouseDrag(ReorderableList list)
         {
             if (!IsEnabled) return;
 
-            foreach (var drawer in ExtenderDrawers.Where(drawer => drawer.IsVisible))
-            {
-                drawer.OnMouseDrag(list);
-            }
+            foreach (var drawer in ExtenderDrawers.Where(drawer => drawer.IsVisible)) drawer.OnMouseDrag(list);
         }
 
         private void OnRemove(ReorderableList list)
         {
             if (!IsEnabled) return;
 
-            foreach (var drawer in ExtenderDrawers.Where(drawer => drawer.IsVisible))
-            {
-                drawer.OnRemove(list);
-            }
+            foreach (var drawer in ExtenderDrawers.Where(drawer => drawer.IsVisible)) drawer.OnRemove(list);
         }
 
         private void OnSelect(ReorderableList list)
         {
             if (!IsEnabled) return;
 
-            foreach (var drawer in ExtenderDrawers.Where(drawer => drawer.IsVisible))
-            {
-                drawer.OnSelect(list);
-            }
+            foreach (var drawer in ExtenderDrawers.Where(drawer => drawer.IsVisible)) drawer.OnSelect(list);
         }
 
         private void OnChanged(ReorderableList list)
         {
             if (!IsEnabled) return;
 
-            foreach (var drawer in ExtenderDrawers.Where(drawer => drawer.IsVisible))
-            {
-                drawer.OnChanged(list);
-            }
+            foreach (var drawer in ExtenderDrawers.Where(drawer => drawer.IsVisible)) drawer.OnChanged(list);
         }
 
         private void OnAdd(ReorderableList list)
         {
             if (!IsEnabled) return;
 
-            foreach (var drawer in ExtenderDrawers.Where(drawer => drawer.IsVisible))
-            {
-                drawer.OnAdd(list);
-            }
+            foreach (var drawer in ExtenderDrawers.Where(drawer => drawer.IsVisible)) drawer.OnAdd(list);
         }
 
         public override void Repaint()

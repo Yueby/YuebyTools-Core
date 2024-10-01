@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using HarmonyLib;
 using UnityEditor;
-using UnityEngine;
-using Yueby.EditorWindowExtends.Core;
 using YuebyTools.Core.Utils;
 
 namespace Yueby.EditorWindowExtends.HarmonyPatches
@@ -41,7 +38,6 @@ namespace Yueby.EditorWindowExtends.HarmonyPatches
             // Debug.Log("Applying Harmony patches");
             _harmony = new Harmony("yueby.tools.core");
             foreach (var patch in Patches)
-            {
                 try
                 {
                     patch(_harmony);
@@ -52,12 +48,8 @@ namespace Yueby.EditorWindowExtends.HarmonyPatches
                     Log.Exception(e);
                     _initializedCount--;
                 }
-            }
 
-            if (_initializedCount == Patches.Length)
-            {
-                Log.Info("All patches applied.");
-            }
+            if (_initializedCount == Patches.Length) Log.Info("All patches applied.");
 
             AssemblyReloadEvents.beforeAssemblyReload -= UnpatchAll;
             AssemblyReloadEvents.beforeAssemblyReload += UnpatchAll;
