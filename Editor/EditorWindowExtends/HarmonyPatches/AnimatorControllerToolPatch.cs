@@ -46,6 +46,7 @@ namespace Yueby.EditorWindowExtends.HarmonyPatches
                 return;
 
             _graphGUI = Mapper.Map<GraphGUI>(__instance);
+            _graphGUI.Instance = __instance;
             // Log.Info(JsonUtility.ToJson(graphGUI), __instance.GetInstanceID(), "|", graphGUI.Name, graphGUI.Graph.nodes.Count);
         }
 

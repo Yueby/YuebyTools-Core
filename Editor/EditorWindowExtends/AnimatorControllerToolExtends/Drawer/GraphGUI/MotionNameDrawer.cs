@@ -15,16 +15,15 @@ namespace Yueby.EditorWindowExtends.AnimatorControllerToolExtends.Drawer.GraphGU
             base.OnDrawGraphGUI(graphGUI, stateNode);
             if (stateNode.State == null) return;
             var label = stateNode.State.motion == null ? "None" : stateNode.State.motion.name;
-            var rect = stateNode.Position;
-            rect.y += EditorGUIUtility.singleLineHeight * 0.5f;
+            var labelSize = GUI.skin.label.CalcSize(new GUIContent(label));
+            var rect = stateNode.Rect;
+            rect.height = labelSize.y;
+            rect.width = labelSize.x;
+            rect.x = stateNode.Rect.x + stateNode.Rect.width / 2 - rect.width / 2;
 
-            GUI.Label(rect, label, new GUIStyle(GUI.skin.label)
-            {
-                alignment = TextAnchor.MiddleCenter,
-                fontSize = 10,
-                fontStyle = FontStyle.Bold,
-                normal = { textColor = new Color(GUI.skin.label.normal.textColor.r, GUI.skin.label.normal.textColor.g, GUI.skin.label.normal.textColor.b, 0.7f) },
-            });
+            rect.y += stateNode.Rect.height - rect.height - 2;
+
+            GUI.Label(rect, label, Styles.LabelStyle);
         }
     }
 }

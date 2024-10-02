@@ -23,9 +23,18 @@ namespace Yueby.Utils.Reflections
             var sourceType = source.GetType();
             var targetType = target.GetType();
 
+            // Set Instance property if it exists
+            var instanceProperty = targetType.GetProperty("Instance");
+            if (instanceProperty != null && instanceProperty.PropertyType == typeof(object))
+            {
+                instanceProperty.SetValue(target, source);
+            }
+
             // Map properties
             foreach (var targetProperty in targetType.GetProperties())
             {
+                if (targetProperty.Name == "Instance") continue; // Skip the Instance property
+
                 var targetPropertyName = GetSourceName(targetProperty);
                 var sourceProperty = AccessTools.Property(sourceType, targetPropertyName);
 
@@ -78,6 +87,8 @@ namespace Yueby.Utils.Reflections
             // Map fields
             foreach (var targetField in targetType.GetFields())
             {
+                if (targetField.Name == "Instance") continue; // Skip the Instance field
+
                 var targetFieldName = GetSourceName(targetField);
                 var sourceField = AccessTools.Field(sourceType, targetFieldName);
 
@@ -125,6 +136,13 @@ namespace Yueby.Utils.Reflections
                         }
                     }
                 }
+            }
+
+            // Set Instance field if it exists
+            var instanceField = targetType.GetField("Instance");
+            if (instanceField != null && instanceField.FieldType == typeof(object))
+            {
+                instanceField.SetValue(target, source);
             }
         }
 
