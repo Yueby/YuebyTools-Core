@@ -1,14 +1,12 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using UnityEditor;
 using UnityEditor.Compilation;
 using UnityEngine;
 using Yueby.EditorWindowExtends.AnimatorControllerToolExtends;
 using Yueby.EditorWindowExtends.Core;
+using Yueby.EditorWindowExtends.HierarchyExtends;
 using Yueby.EditorWindowExtends.ProjectBrowserExtends;
 using Yueby.Utils;
-using YuebyTools.Core.Utils;
 
 namespace Yueby.EditorWindowExtends
 {
@@ -40,6 +38,7 @@ namespace Yueby.EditorWindowExtends
             ExtenderOptionHandlers.Add(new ExtenderOptionHandler(LayerControllerViewExtender.Instance));
             ExtenderOptionHandlers.Add(new ExtenderOptionHandler(ParameterControllerViewExtender.Instance));
             ExtenderOptionHandlers.Add(new ExtenderOptionHandler(GraphGUIExtender.Instance));
+            ExtenderOptionHandlers.Add(new ExtenderOptionHandler(HierarchyExtender.Instance));
         }
 
         private void OnGUI()

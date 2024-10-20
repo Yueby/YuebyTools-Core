@@ -1,9 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Yueby.EditorWindowExtends.AnimatorControllerToolExtends.Core;
 using Yueby.EditorWindowExtends.HarmonyPatches.MapperObject;
-using YuebyTools.Core.Utils;
+using Yueby.Utils;
 
 public class WriteDefaultDrawer : GraphGUIDrawer
 {
@@ -23,13 +21,19 @@ public class WriteDefaultDrawer : GraphGUIDrawer
         wdLabelRect.y += stateNode.Rect.height - wdLabelRect.height - 2;
 
 
-        GUI.Label(wdLabelRect, label, Styles.WdLabelStyle);
-
-        if (Event.current.type == EventType.MouseDown && wdLabelRect.Contains(Event.current.mousePosition))
+        if (wdLabelRect.Contains(Event.current.mousePosition))
         {
-            writeDefaultValues = !writeDefaultValues;
-            stateNode.State.writeDefaultValues = writeDefaultValues;
-            Log.Info(graphGUI.Instance, stateNode.Instance);
+            EditorUtils.CurrentControlEventType(evtType =>
+            {
+                if (evtType == EventType.Used)
+                {
+                    writeDefaultValues = !writeDefaultValues;
+                    stateNode.State.writeDefaultValues = writeDefaultValues;
+                }
+            });
+
         }
+
+        GUI.Label(wdLabelRect, label, Styles.WdLabelStyle);
     }
 }

@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using HarmonyLib;
 using UnityEditor;
-using YuebyTools.Core.Utils;
+using Yueby.Core.Utils;
 
 namespace Yueby.EditorWindowExtends.HarmonyPatches
 {
@@ -45,11 +45,11 @@ namespace Yueby.EditorWindowExtends.HarmonyPatches
                 }
                 catch (Exception e)
                 {
-                    Log.Exception(e);
+                    Logger.LogException(e);
                     _initializedCount--;
                 }
 
-            if (_initializedCount == Patches.Length) Log.Info("All patches applied.");
+            if (_initializedCount == Patches.Length) Logger.LogInfo("All patches applied.");
 
             AssemblyReloadEvents.beforeAssemblyReload -= UnpatchAll;
             AssemblyReloadEvents.beforeAssemblyReload += UnpatchAll;

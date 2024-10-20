@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -5,6 +6,7 @@ using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Events;
+using Object = UnityEngine.Object;
 
 namespace Yueby.Utils
 {
@@ -29,11 +31,11 @@ namespace Yueby.Utils
         public static void PingProject(string path)
         {
             EditorUtility.FocusProjectWindow();
-            var obj = AssetDatabase.LoadAssetAtPath<Object>(path);
+            var obj = AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(path);
             Selection.activeObject = obj;
         }
 
-        public static void PingProject(Object obj)
+        public static void PingProject(UnityEngine.Object obj)
         {
             EditorUtility.FocusProjectWindow();
             Selection.activeObject = obj;
@@ -298,7 +300,7 @@ namespace Yueby.Utils
                 File.Delete(path);
             File.WriteAllBytes(path, tex.EncodeToPNG());
 
-            Object.DestroyImmediate(tex);
+            UnityEngine.Object.DestroyImmediate(tex);
 
             camera.targetTexture = target;
             camera.Render();
@@ -309,6 +311,17 @@ namespace Yueby.Utils
             var t2d = AssetDatabase.LoadAssetAtPath<Texture2D>(path);
 
             return t2d;
+        }
+
+        public static void CurrentControlEventType(Action<EventType> action)
+        {
+            var id = GUIUtility.GetControlID(FocusType.Passive);
+            GUIUtility.hotControl = id;
+            var eventType = Event.current.GetTypeForControl(id);
+
+            action?.Invoke(eventType);
+
+            GUIUtility.hotControl = 0;
         }
     }
 }

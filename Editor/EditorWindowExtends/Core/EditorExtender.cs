@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEditor;
+using Yueby.Core.Utils;
 
 namespace Yueby.EditorWindowExtends.Core
 {
@@ -65,8 +66,8 @@ namespace Yueby.EditorWindowExtends.Core
             {
                 ExtenderDrawers[i].ChangeOrder(i);
             }
-        }
 
+        }
 
         private IEnumerable<Type> GetAllDrawerTypes()
         {
@@ -90,7 +91,6 @@ namespace Yueby.EditorWindowExtends.Core
             IsEnabled = value;
         }
 
-
         public virtual void Repaint()
         {
         }
@@ -101,7 +101,6 @@ namespace Yueby.EditorWindowExtends.Core
             drawers.Sort((a, b) => a.Order.CompareTo(b.Order));
             return drawers;
         }
-
 
         // protected virtual void ShowOptions()
         // {

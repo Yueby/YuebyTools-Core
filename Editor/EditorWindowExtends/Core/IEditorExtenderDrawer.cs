@@ -7,9 +7,6 @@
         string DrawerName { get; }
         string Tooltip { get; }
 
-        void OnOrderPropertyChanged(int value);
-        void OnVisiblePropertyChanged(bool value);
-
         void ChangeVisible(bool value);
         void ChangeOrder(int value);
         void Repaint();

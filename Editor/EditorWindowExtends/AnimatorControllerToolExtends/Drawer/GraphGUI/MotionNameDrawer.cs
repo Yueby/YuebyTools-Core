@@ -1,5 +1,4 @@
-﻿using UnityEditor;
-using UnityEngine;
+﻿using UnityEngine;
 using Yueby.EditorWindowExtends.AnimatorControllerToolExtends.Core;
 using Yueby.EditorWindowExtends.HarmonyPatches.MapperObject;
 

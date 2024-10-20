@@ -4,8 +4,10 @@ using System.Linq;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
+using Yueby.Core.Utils;
 using Yueby.EditorWindowExtends.Core;
 using Yueby.EditorWindowExtends.ProjectBrowserExtends.Core;
+using Logger = Yueby.Core.Utils.Logger;
 
 namespace Yueby.EditorWindowExtends.ProjectBrowserExtends
 {
@@ -34,7 +36,6 @@ namespace Yueby.EditorWindowExtends.ProjectBrowserExtends
             SetEnable(IsEnabled);
         }
 
-
         public override void SetEnable(bool value)
         {
             if (!value)
@@ -58,6 +59,8 @@ namespace Yueby.EditorWindowExtends.ProjectBrowserExtends
         {
             _mouseOverWindow = EditorWindow.mouseOverWindow;
             // Debug.Log(_mouseOverWindow.GetType());
+
+            // Logger.LogInfo(_mouseOverWindow.GetType().FullName);
         }
 
         public static void OnProjectBrowserObjectAreaItemGUI(int instanceID, Rect rect)
@@ -65,9 +68,10 @@ namespace Yueby.EditorWindowExtends.ProjectBrowserExtends
             if (!Instance.IsEnabled)
                 return;
 
-            var guid = AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(instanceID));
             if (Instance is { ExtenderDrawers: null })
                 return;
+
+            var guid = AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(instanceID));
 
             Instance.CheckRepaintAndDoGUI(
                 guid,

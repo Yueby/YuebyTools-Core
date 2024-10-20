@@ -1,6 +1,5 @@
 ﻿using UnityEditor;
 using Yueby.Core;
-using YuebyTools.Core.Utils;
 
 namespace Yueby.EditorWindowExtends.Core
 {
@@ -8,8 +7,6 @@ namespace Yueby.EditorWindowExtends.Core
         where TExtender : EditorExtender<TExtender, TDrawer>, new()
         where TDrawer : EditorExtenderDrawer<TExtender, TDrawer>, new()
     {
-        protected readonly BindProperty<bool> IsVisibleProperty = new(true);
-        protected readonly BindProperty<int> OrderProperty = new(0);
 
         // 将 Extender 属性修改为 TExtender 类型
         public virtual TExtender Extender { get; set; }
@@ -21,7 +18,7 @@ namespace Yueby.EditorWindowExtends.Core
             get
             {
                 var isVisible = EditorPrefs.GetBool($"{SavePath}.IsVisible", true);
-                IsVisibleProperty.Value = isVisible;
+
                 return isVisible;
             }
         }
@@ -31,7 +28,7 @@ namespace Yueby.EditorWindowExtends.Core
             get
             {
                 var order = EditorPrefs.GetInt($"{SavePath}.Order", DefaultOrder);
-                OrderProperty.Value = order;
+
                 return order;
             }
         }
@@ -49,37 +46,26 @@ namespace Yueby.EditorWindowExtends.Core
         public virtual void Init(TExtender extender)
         {
             Extender = extender;
-            IsVisibleProperty.ValueChanged += OnVisiblePropertyChanged;
-            OrderProperty.ValueChanged += OnOrderPropertyChanged;
+
         }
 
+        public void ChangeVisible(bool value)
+        {
+            EditorPrefs.SetBool($"{SavePath}.IsVisible", value);
+            Repaint();
+        }
 
-        public virtual void OnOrderPropertyChanged(int value)
+        public void ChangeOrder(int value)
         {
             EditorPrefs.SetInt($"{SavePath}.Order", value);
 
             Repaint();
         }
 
-        public virtual void OnVisiblePropertyChanged(bool value)
-        {
-            EditorPrefs.SetBool($"{SavePath}.IsVisible", value);
-            Repaint();
-        }
-
-        public void ChangeVisible(bool value)
-        {
-            IsVisibleProperty.Value = value;
-        }
-
-        public void ChangeOrder(int value)
-        {
-            OrderProperty.Value = value;
-        }
-
         public void Repaint()
         {
             Extender.Repaint();
         }
+
     }
 }

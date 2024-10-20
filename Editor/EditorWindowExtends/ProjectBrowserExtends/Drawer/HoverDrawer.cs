@@ -1,6 +1,7 @@
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
+using Yueby.EditorWindowExtends.Core;
 using Yueby.EditorWindowExtends.ProjectBrowserExtends.Core;
 using Yueby.EditorWindowExtends.Reflections;
 using Yueby.EditorWindowExtends.Utils;
@@ -14,6 +15,7 @@ namespace Yueby.EditorWindowExtends.ProjectBrowserExtends.Drawer
         private Rect _hoverRect;
         private bool _isDown;
         private AssetItem _lastHoverItem;
+        // private readonly DrawerColor bkgColor = new(new Color(0f, 0f, 0f, 0.03137255f), new Color(0f, 0f, 0f, 0.07450981f));
 
         public override void OnProjectBrowserObjectAreaItemGUI(AssetItem item)
         {
@@ -68,6 +70,7 @@ namespace Yueby.EditorWindowExtends.ProjectBrowserExtends.Drawer
             );
 
             var color = GameObjectStylesReflect.GetHoveredBackgroundColor();
+            color.a = 0.5f;
 
             using (new BackgroundColorScope(color))
             {
