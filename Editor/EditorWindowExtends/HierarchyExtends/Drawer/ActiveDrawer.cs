@@ -22,11 +22,11 @@ namespace Yueby.EditorWindowExtends.HierarchyExtends.Drawer
         {
             base.OnHierarchyWindowItemGUI(selectionItem);
             if (selectionItem.TargetObject == null) return;
-            
-            if (selectionItem.TargetObject.activeSelf)
-            {
-                if (!selectionItem.IsHover) return;
-            }
+            if (!selectionItem.IsHover) return;
+            // if (selectionItem.TargetObject.activeSelf)
+            // {
+            //     if (!selectionItem.IsHover) return;
+            // }
 
             var height = EditorGUIUtility.singleLineHeight;
             DrawControl(selectionItem, height + 2, height, (rect) =>
