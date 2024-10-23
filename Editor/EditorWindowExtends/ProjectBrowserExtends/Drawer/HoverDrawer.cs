@@ -15,7 +15,7 @@ namespace Yueby.EditorWindowExtends.ProjectBrowserExtends.Drawer
         private Rect _hoverRect;
         private bool _isDown;
         private AssetItem _lastHoverItem;
-        // private readonly DrawerColor bkgColor = new(new Color(0f, 0f, 0f, 0.03137255f), new Color(0f, 0f, 0f, 0.07450981f));
+        private readonly DrawerColor bkgColor = new(new Color(0f, 0f, 0f, 0.03137255f), new Color(0f, 0f, 0f, 0.07450981f));
 
         public override void OnProjectBrowserObjectAreaItemGUI(AssetItem item)
         {
@@ -69,8 +69,8 @@ namespace Yueby.EditorWindowExtends.ProjectBrowserExtends.Drawer
                 : 0
             );
 
-            var color = GameObjectStylesReflect.GetHoveredBackgroundColor();
-            color.a = 0.5f;
+            var color = bkgColor.GetColor(); //GameObjectStylesReflect.GetHoveredBackgroundColor();
+            // color.a = 0.5f;
 
             using (new BackgroundColorScope(color))
             {
