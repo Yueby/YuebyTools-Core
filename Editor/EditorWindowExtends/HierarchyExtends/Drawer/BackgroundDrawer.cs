@@ -10,7 +10,7 @@ namespace Yueby.EditorWindowExtends.HierarchyExtends.Drawer
     public class BackgroundDrawer : HierarchyDrawer
     {
         public override string DrawerName => "Background";
-        public override int DefaultOrder => -1;
+        public override int DefaultOrder => 0;
 
         public override void OnHierarchyWindowItemGUI(SelectionItem selectionItem)
         {
@@ -22,8 +22,8 @@ namespace Yueby.EditorWindowExtends.HierarchyExtends.Drawer
 
                 selectionRect.width += selectionRect.x;
                 selectionRect.x = 0;
-                selectionRect.height -= 1;
-                selectionRect.y += 1;
+                // selectionRect.height -= 1;
+                // selectionRect.y += 1;
                 EditorGUI.DrawRect(selectionRect, (Mathf.FloorToInt((selectionRect.y - 4) / 16 % 2) == 0) ? Styles.EvenShadingColor.GetColor() : Styles.OddShadingColor.GetColor());
             }
         }

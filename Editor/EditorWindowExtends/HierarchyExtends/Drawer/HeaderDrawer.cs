@@ -11,6 +11,7 @@ namespace Yueby.EditorWindowExtends.HierarchyExtends.Drawer
 {
     public class HeaderDrawer : HierarchyDrawer
     {
+        public override int DefaultOrder => 2;
 
         public override void OnHierarchyWindowItemGUI(SelectionItem selectionItem)
         {

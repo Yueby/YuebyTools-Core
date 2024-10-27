@@ -3,6 +3,7 @@ using UnityEditor;
 using UnityEngine;
 using Yueby.EditorWindowExtends.Core;
 using Yueby.EditorWindowExtends.HierarchyExtends.Core;
+using Yueby.EditorWindowExtends.Utils;
 
 namespace Yueby.EditorWindowExtends.HierarchyExtends
 {
@@ -22,7 +23,6 @@ namespace Yueby.EditorWindowExtends.HierarchyExtends
         {
             var rect = item.Rect;
 
-
             rect.y -= 1;
 
             rect.xMin = rect.xMax - width;
@@ -30,6 +30,7 @@ namespace Yueby.EditorWindowExtends.HierarchyExtends
             // var iconSize = EditorGUIUtility.GetIconSize();
             // EditorGUIUtility.SetIconSize(new Vector2(12, 12));
 
+            // EditorGUI.DrawRect(rect, Styles.HierarchyBackgroundColor.GetColor());
             // if (GUI.Button(rect, content))
             onClick?.Invoke(rect);
 

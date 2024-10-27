@@ -10,7 +10,7 @@ namespace Yueby.EditorWindowExtends.HierarchyExtends.Drawer
     public class SeparatorDrawer : HierarchyDrawer
     {
         public override string DrawerName => "Separator";
-        public override int DefaultOrder => 10;
+        public override int DefaultOrder => 3;
 
         public override void OnHierarchyWindowItemGUI(SelectionItem selectionItem)
         {
@@ -18,7 +18,7 @@ namespace Yueby.EditorWindowExtends.HierarchyExtends.Drawer
 
             if (selectionItem.OriginRect.height <= EditorGUIUtility.singleLineHeight)
             {
-                var rect = new Rect(selectionItem.OriginRect.x, selectionItem.OriginRect.y + selectionItem.OriginRect.height, selectionItem.OriginRect.width + selectionItem.OriginRect.x, 1);
+                var rect = new Rect(selectionItem.OriginRect.x, selectionItem.OriginRect.y + selectionItem.OriginRect.height - 1f, selectionItem.OriginRect.width + selectionItem.OriginRect.x, 1);
                 EditorGUI.DrawRect(rect, Styles.SeparatorColor.GetColor());
             }
         }

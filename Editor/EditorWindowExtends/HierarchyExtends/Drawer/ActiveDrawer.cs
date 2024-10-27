@@ -15,6 +15,7 @@ namespace Yueby.EditorWindowExtends.HierarchyExtends.Drawer
 {
     public class ActiveDrawer : HierarchyDrawer
     {
+        public override int DefaultOrder => 1;
         private DrawerIconContent _visibleIconContent = new(EditorGUIUtility.IconContent("animationvisibilitytoggleon@2x"), EditorGUIUtility.IconContent("animationvisibilitytoggleoff@2x"));
         // private DrawerIconContent _visibleHoverIconContent = new(EditorGUIUtility.IconContent("animationvisibilitytoggleon@2x"), EditorGUIUtility.IconContent("animationvisibilitytoggleoff@2x"));
 
@@ -22,7 +23,7 @@ namespace Yueby.EditorWindowExtends.HierarchyExtends.Drawer
         {
             base.OnHierarchyWindowItemGUI(selectionItem);
             if (selectionItem.TargetObject == null) return;
-            if (!selectionItem.IsHover) return;
+            // if (!selectionItem.IsHover) return;
             // if (selectionItem.TargetObject.activeSelf)
             // {
             //     if (!selectionItem.IsHover) return;
@@ -38,7 +39,7 @@ namespace Yueby.EditorWindowExtends.HierarchyExtends.Drawer
 
                 var iconSize = EditorGUIUtility.GetIconSize();
 
-                EditorGUI.BeginDisabledGroup(!selectionItem.TargetObject.activeSelf);
+                EditorGUI.BeginDisabledGroup(!selectionItem.TargetObject.activeSelf || !selectionItem.TargetObject.activeInHierarchy);
                 EditorGUIUtility.SetIconSize(new Vector2(height - 2, height - 2));
                 GUI.Label(rect, selectionItem.TargetObject.activeSelf ? _visibleIconContent.Light : _visibleIconContent.Dark);
                 EditorGUIUtility.SetIconSize(iconSize);
