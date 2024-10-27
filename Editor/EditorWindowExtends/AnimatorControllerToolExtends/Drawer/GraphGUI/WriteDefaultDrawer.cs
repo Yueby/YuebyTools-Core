@@ -29,6 +29,7 @@ public class WriteDefaultDrawer : GraphGUIDrawer
                 {
                     writeDefaultValues = !writeDefaultValues;
                     stateNode.State.writeDefaultValues = writeDefaultValues;
+                    Event.current.Use();
                 }
             });
 

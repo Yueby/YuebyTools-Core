@@ -1,6 +1,8 @@
 ﻿using UnityEditorInternal;
 using UnityEngine;
+using Yueby.Core.Utils;
 using Yueby.EditorWindowExtends.AnimatorControllerToolExtends.Core;
+using Logger = Yueby.Core.Utils.Logger;
 
 namespace Yueby.EditorWindowExtends.AnimatorControllerToolExtends.Drawer.LayerControllerView
 {
@@ -8,6 +10,7 @@ namespace Yueby.EditorWindowExtends.AnimatorControllerToolExtends.Drawer.LayerCo
     {
         private int _lastCount;
         private Vector2 _scrollPosition;
+
         public override string DrawerName => "Scroll Position Fix";
         public override string Tooltip => "Fix layer delete and add scroll position";
 
@@ -32,7 +35,6 @@ namespace Yueby.EditorWindowExtends.AnimatorControllerToolExtends.Drawer.LayerCo
                     var y = rect.height * ReorderableList.list.Count;
                     _scrollPosition.y = y;
                 }
-
 
                 _lastCount = ReorderableList.list.Count;
             }

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
@@ -13,7 +14,6 @@ namespace Yueby.EditorWindowExtends.AnimatorControllerToolExtends
         private static ReorderableList _lastList;
 
         private int _lastIndex = -1;
-
 
         static LayerControllerViewExtender()
         {
@@ -42,8 +42,16 @@ namespace Yueby.EditorWindowExtends.AnimatorControllerToolExtends
             _lastList.drawElementCallback += OnDrawElement;
             _lastList.drawElementBackgroundCallback += OnDrawElementBackground;
 
+            EditorApplication.update -= OnUpdate;
+            EditorApplication.update += OnUpdate;
 
             foreach (var drawer in ExtenderDrawers) drawer.Init(this, _lastList);
+        }
+
+        private void OnUpdate()
+        {
+            foreach (var drawer in ExtenderDrawers.Where(drawer => drawer.IsVisible))
+                drawer?.OnUpdate();
         }
 
         public override string Name => "Layer View";

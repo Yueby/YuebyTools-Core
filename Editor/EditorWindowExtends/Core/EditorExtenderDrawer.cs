@@ -67,5 +67,10 @@ namespace Yueby.EditorWindowExtends.Core
             Extender.Repaint();
         }
 
+        public virtual void OnUpdate()
+        {
+
+        }
+
     }
 }
