@@ -18,7 +18,7 @@ public static class AssetsUtil
     [MenuItem("Assets/YuebyTools/Copy File Path (Absolute)", priority = 10000)]
     public static void CopyFileAbsolutePath()
     {
-        var path = GetPhysicalPath(Selection.activeObject);
+        var path =Application.dataPath.Replace("Assets", "") + AssetDatabase.GetAssetPath(Selection.activeObject);
         CopyToClipboard(path, "path");
     }
 
@@ -28,7 +28,7 @@ public static class AssetsUtil
     [MenuItem("Assets/YuebyTools/Copy Directory Path (Absolute)", priority = 10001)]
     public static void CopyDirectoryPhysicalPath()
     {
-        var path = GetPhysicalPath(Selection.activeObject);
+        var path = Application.dataPath.Replace("Assets", "") + AssetDatabase.GetAssetPath(Selection.activeObject);
         var directoryPath = Path.GetDirectoryName(path);
         CopyToClipboard(directoryPath, "directory path");
     }
@@ -42,16 +42,9 @@ public static class AssetsUtil
         if (!ValidateOpenFolderInBrowser())
             return;
 
-        var path =
-            Application.dataPath.Replace("Assets", "")
-            + AssetDatabase.GetAssetPath(Selection.activeObject);
+        var path = Application.dataPath.Replace("Assets", "") + AssetDatabase.GetAssetPath(Selection.activeObject);
         System.Diagnostics.Process.Start(path);
         Logger.LogInfo($"Opening folder: {path}");
-    }
-
-    private static string GetPhysicalPath(Object asset)
-    {
-        return FileUtil.GetPhysicalPath(AssetDatabase.GetAssetPath(asset));
     }
 
     private static void CopyToClipboard(string content, string description)
