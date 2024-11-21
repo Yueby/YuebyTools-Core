@@ -1,6 +1,6 @@
 using System;
 using System.Reflection;
-using HarmonyLib;
+using Yueby.Core.Utils;
 
 namespace Yueby.Utils.Reflections
 {
@@ -25,20 +25,20 @@ namespace Yueby.Utils.Reflections
         {
             if ((object)type == null)
             {
-                FileLog.Debug("ReflectionUtil.Field: type is null");
+                Logger.LogInfo($"ReflectionUtil.Field: type is null");
                 return null;
             }
 
             if (name == null)
             {
-                FileLog.Debug("ReflectionUtil.Field: name is null");
+                Logger.LogInfo($"ReflectionUtil.Field: name is null");
                 return null;
             }
 
             FieldInfo fieldInfo = FindIncludingBaseTypes(type, (Type t) => t.GetField(name, all));
             if ((object)fieldInfo == null)
             {
-                FileLog.Debug(
+                Logger.LogInfo(
                     $"ReflectionUtil.Field: Could not find field for type {type} and name {name}"
                 );
             }
