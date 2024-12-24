@@ -165,7 +165,7 @@ namespace Yueby.Utils
 
             if (!allowDrop) return;
 
-            if (!AnimBool.target)
+            if (!AnimBool.target && hasFoldout)
             {
                 if (Event.current.type == EventType.DragUpdated && _foldoutRect.Contains(Event.current.mousePosition))
                     ChangeAnimBool(true);
@@ -207,7 +207,6 @@ namespace Yueby.Utils
         public void DoLayout(string title, bool isNoBorder = false, bool hasFoldout = true, bool allowDrop = true, bool drawCount = true, UnityAction<Object[]> onDropped = null, UnityAction repaint = null)
         {
             var listRect = new Rect();
-
 
             if (hasFoldout)
             {
@@ -302,7 +301,6 @@ namespace Yueby.Utils
                     EditorGUILayout.Space();
                 }
 
-
                 titleDraw?.Invoke();
                 if (_isShowAddButton && GUILayout.Button("+", GUILayout.Width(25), GUILayout.Height(18)))
                     //添加
@@ -334,6 +332,25 @@ namespace Yueby.Utils
                     EditorGUILayout.HelpBox("List is null!", MessageType.Info);
                 else
                     List?.DoLayoutList();
+            }
+        }
+
+        public void RefreshElementHeights()
+        {
+            if (_elements == null) return;
+            
+            Array.Resize(ref ElementHeights, _elements.Count);
+            for (int i = 0; i < _elements.Count; i++)
+            {
+                if (OnDraw != null)
+                {
+                    var rect = new Rect(0, 0, 100, EditorGUIUtility.singleLineHeight); // 临时矩形用于获取高度
+                    ElementHeights[i] = OnDraw.Invoke(rect, i, false, false);
+                }
+                else
+                {
+                    ElementHeights[i] = EditorGUIUtility.singleLineHeight;
+                }
             }
         }
     }
