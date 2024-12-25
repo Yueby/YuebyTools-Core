@@ -42,9 +42,9 @@ namespace Yueby
                     
                     // 配置标题和材质信息
                     var materialInfo = "";
-                    if (config.materials.Count > 0 && config.currentMaterialIndex >= 0 && config.currentMaterialIndex < config.materials.Count)
+                    if (config.materials.Count > 0 && config.appliedMaterialIndex >= 0 && config.appliedMaterialIndex < config.materials.Count)
                     {
-                        var currentMaterial = config.materials[config.currentMaterialIndex];
+                        var currentMaterial = config.materials[config.appliedMaterialIndex];
                         materialInfo = currentMaterial != null ? currentMaterial.name : "None";
                     }
                     

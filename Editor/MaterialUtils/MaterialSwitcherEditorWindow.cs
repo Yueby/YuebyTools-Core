@@ -46,14 +46,14 @@ namespace Yueby
                 {
                     UpdateMaterialSlots(data);
                     data.SelectedMaterialIndex = config.selectedMaterialIndex;
-                    data.CurrentMaterialIndex = config.currentMaterialIndex;
                     
+                    // 初始化应用状态
                     if (config.materials.Count > 0 && 
-                        config.currentMaterialIndex >= 0 && 
-                        config.currentMaterialIndex < config.materials.Count)
+                        config.appliedMaterialIndex >= 0 && 
+                        config.appliedMaterialIndex < config.materials.Count)
                     {
                         data.IsApplied = true;
-                        data.AppliedMaterial = config.materials[config.currentMaterialIndex];
+                        data.AppliedMaterial = config.materials[config.appliedMaterialIndex];
                     }
                 }
                 
@@ -71,9 +71,10 @@ namespace Yueby
                 var config = new MaterialSwitcher.RendererConfig
                 {
                     name = data.Name,
-                    rendererPath = data.Renderer != null ? GetRelativePath(_targetComponent.transform, data.Renderer.transform) : "",
+                    rendererPath = data.Renderer != null ? 
+                        GetRelativePath(_targetComponent.transform, data.Renderer.transform) : "",
                     selectedMaterialIndex = data.SelectedMaterialIndex,
-                    currentMaterialIndex = data.IsApplied ? data.CurrentMaterialIndex : -1, // 只保存已应用的材质索引
+                    appliedMaterialIndex = data.IsApplied ? data.AppliedMaterialIndex : -1,
                     materials = new List<Material>(data.Materials),
                     isFoldout = data.IsFoldout
                 };
@@ -86,31 +87,11 @@ namespace Yueby
 
         private void OnDisable()
         {
-            // 先保存数据
-            SaveToComponent();
+            // 先退出所有预览状态
+            ResetAllPreviews();
             
-            // 再恢复未应用的预览
-            foreach (var data in _rendererDatas)
-            {
-                if (data.Renderer == null) continue;
-                
-                if (data.IsPreviewMode)
-                {
-                    var materials = data.Renderer.sharedMaterials;
-                    // 如果已经应用了，保持应用的材质
-                    if (data.IsApplied)
-                    {
-                        materials[data.SelectedMaterialIndex] = data.AppliedMaterial;
-                    }
-                    // 如果未应用，恢复原始材质
-                    else if (data.OriginalMaterial != null)
-                    {
-                        materials[data.SelectedMaterialIndex] = data.OriginalMaterial;
-                    }
-                    data.Renderer.sharedMaterials = materials;
-                    data.IsPreviewMode = false;
-                }
-            }
+            // 再保存数据
+            SaveToComponent();
         }
 
         private void OnGUI()
@@ -212,12 +193,28 @@ namespace Yueby
                 {
                     // 折叠箭头和标题
                     var titleText = string.IsNullOrEmpty(data.Name) ? $"Renderer {index + 1}" : data.Name;
-                    if (data.Renderer != null && data.Materials.Count > 0 && data.CurrentMaterialIndex >= 0)
+                    if (data.Renderer != null && data.Materials.Count > 0)
                     {
-                        var currentMaterial = data.Materials[data.CurrentMaterialIndex];
-                        if (currentMaterial != null)
+                        string materialName = null;
+                        
+                        // 在预览模式下，显示当前预览的材质
+                        if (data.IsPreviewMode && data.PreviewMaterialIndex >= 0 && data.PreviewMaterialIndex < data.Materials.Count)
                         {
-                            titleText += $" - {currentMaterial.name}";
+                            var previewMaterial = data.Materials[data.PreviewMaterialIndex];
+                            if (previewMaterial != null)
+                            {
+                                materialName = $"{previewMaterial.name} (Preview)";
+                            }
+                        }
+                        // 不在预览模式时，显示已应用的材质
+                        else if (data.IsApplied && data.AppliedMaterial != null)
+                        {
+                            materialName = data.AppliedMaterial.name;
+                        }
+
+                        if (!string.IsNullOrEmpty(materialName))
+                        {
+                            titleText += $" - {materialName}";
                         }
                     }
                     data.IsFoldout = EditorGUILayout.Foldout(data.IsFoldout, titleText, true);
@@ -238,7 +235,7 @@ namespace Yueby
                         }
 
                         // 上一个材质
-                        EditorGUI.BeginDisabledGroup(data.CurrentMaterialIndex <= 0);
+                        EditorGUI.BeginDisabledGroup(!data.IsPreviewMode || data.PreviewMaterialIndex <= 0);
                         if (GUILayout.Button(EditorGUIUtility.IconContent("Animation.PrevKey"), GUILayout.Width(24), GUILayout.Height(20)))
                         {
                             data.SwitchMaterial(-1);
@@ -246,7 +243,7 @@ namespace Yueby
                         EditorGUI.EndDisabledGroup();
 
                         // 下一个材质
-                        EditorGUI.BeginDisabledGroup(data.Materials.Count == 0 || data.CurrentMaterialIndex >= data.Materials.Count - 1);
+                        EditorGUI.BeginDisabledGroup(!data.IsPreviewMode || data.Materials.Count == 0 || data.PreviewMaterialIndex >= data.Materials.Count - 1);
                         if (GUILayout.Button(EditorGUIUtility.IconContent("Animation.NextKey"), GUILayout.Width(24), GUILayout.Height(20)))
                         {
                             data.SwitchMaterial(1);
@@ -370,6 +367,15 @@ namespace Yueby
             }
         }
 
+        private void ResetAllPreviews()
+        {
+            foreach (var data in _rendererDatas)
+            {
+                data.ResetToOriginal();
+            }
+            _globalPreviewMode = false;
+        }
+
         private class RendererData
         {
             private MaterialSwitcher _component;
@@ -427,11 +433,6 @@ namespace Yueby
             // 编辑器运行时数
             public string[] MaterialSlotNames = new string[0];
             public ReorderableListDroppable MaterialList;
-            public int CurrentMaterialIndex
-            {
-                get => _config.currentMaterialIndex;
-                set => _config.currentMaterialIndex = value;
-            }
             private bool _isPreviewMode;
             public bool IsPreviewMode
             {
@@ -442,32 +443,33 @@ namespace Yueby
                     
                     _isPreviewMode = value;
                     
-                    if (Renderer == null || Materials.Count == 0) return;
+                    if (Renderer == null) return;
 
                     if (_isPreviewMode)
                     {
-                        // 开启预览时，先保存原始材质（如果未应用过）
-                        if (!IsApplied)
+                        // 开启预览时
+                        // 1. 保存当前材质作为恢复用
+                        var currentMaterials = Renderer.sharedMaterials;
+                        OriginalMaterial = currentMaterials[SelectedMaterialIndex];
+                        
+                        // 2. 如果之前没有预览过，初始化预览索引为已应用的索引或0
+                        if (_previewMaterialIndex < 0)
                         {
-                            OriginalMaterial = Renderer.sharedMaterials[SelectedMaterialIndex];
-                        }
-                        else
-                        {
-                            // 如果之前已经应用过，确保使用保存的索引
-                            CurrentMaterialIndex = _config.currentMaterialIndex;
+                            _previewMaterialIndex = IsApplied ? AppliedMaterialIndex : 0;
                         }
                         
-                        // 应用预览材质
-                        var materials = Renderer.sharedMaterials;
-                        materials[SelectedMaterialIndex] = Materials[CurrentMaterialIndex];
-                        Renderer.sharedMaterials = materials;
+                        // 3. 应用预览材质
+                        PreviewMaterial();
                     }
                     else
                     {
-                        // 关闭预览时，恢复到已应用的材质或原始材质
+                        // 关闭预览时，恢复到预览前的材质状态
                         var materials = Renderer.sharedMaterials;
-                        materials[SelectedMaterialIndex] = IsApplied ? AppliedMaterial : OriginalMaterial;
+                        materials[SelectedMaterialIndex] = OriginalMaterial;
                         Renderer.sharedMaterials = materials;
+                        
+                        // 重置预览索引
+                        _previewMaterialIndex = -1;
                     }
                 }
             }
@@ -475,35 +477,48 @@ namespace Yueby
             public Material AppliedMaterial;
             public bool IsApplied;
 
+            private int _previewMaterialIndex = -1;
+            public int PreviewMaterialIndex 
+            {
+                get => _previewMaterialIndex;
+                set
+                {
+                    if (_previewMaterialIndex == value) return;
+                    _previewMaterialIndex = value;
+                    if (IsPreviewMode)
+                    {
+                        PreviewMaterial();
+                    }
+                }
+            }
+
+            // 添加属性来访问应用的材质索引
+            public int AppliedMaterialIndex
+            {
+                get => _config.appliedMaterialIndex;
+                private set => _config.appliedMaterialIndex = value;
+            }
+
             public RendererData(MaterialSwitcher.RendererConfig config, MaterialSwitcher component)
             {
                 _config = config;
                 _component = component;
                 _window = EditorWindow.GetWindow<MaterialSwitcherEditorWindow>();
-                CurrentMaterialIndex = config.currentMaterialIndex; // 恢复保存的材质索引
                 
-                // 如果有保存的材质，则标记为已应用
+                // 初始化预览索引为-1（未预览状态）
+                _previewMaterialIndex = -1;
+                
+                // 初始化应用状态
                 IsApplied = config.materials.Count > 0 && 
-                            config.currentMaterialIndex >= 0 && 
-                            config.currentMaterialIndex < config.materials.Count;
+                            config.appliedMaterialIndex >= 0 && 
+                            config.appliedMaterialIndex < config.materials.Count;
+                
                 if (IsApplied)
                 {
-                    AppliedMaterial = config.materials[config.currentMaterialIndex];
+                    AppliedMaterial = config.materials[config.appliedMaterialIndex];
                 }
                 
                 InitializeList();
-
-                // 初始化材质槽名称数组
-                MaterialSlotNames = new string[0];
-                if (Renderer != null)
-                {
-                    var materials = Renderer.sharedMaterials;
-                    MaterialSlotNames = new string[materials.Length];
-                    for (int i = 0; i < materials.Length; i++)
-                    {
-                        MaterialSlotNames[i] = $"Slot {i} ({(materials[i] != null ? materials[i].name : "None")})";
-                    }
-                }
             }
 
             private void InitializeList()
@@ -524,16 +539,46 @@ namespace Yueby
                     return EditorGUIUtility.singleLineHeight;
                 };
 
-                MaterialList.OnAdd += _ => Materials.Add(null);
+                MaterialList.OnAdd += _ => 
+                {
+                    Materials.Add(null);
+                    CheckMaterialIndexes(); // 添加时检查
+                };
+
                 MaterialList.OnRemove += list =>
                 {
                     if (list.index >= 0 && list.index < Materials.Count)
                     {
                         Materials.RemoveAt(list.index);
+                        CheckMaterialIndexes(); // 删除时检查
+                    }
+                };
+
+                MaterialList.OnChanged += _ => 
+                {
+                    // 只在重排序时更新预览
+                    if (IsPreviewMode && PreviewMaterialIndex >= 0)
+                    {
+                        PreviewMaterial();
                     }
                 };
 
                 MaterialList.RefreshElementHeights();
+            }
+
+            // 添加新方法来检查索引
+            private void CheckMaterialIndexes()
+            {
+                // 如果删除了正在预览或应用的材质，重置状态
+                if (PreviewMaterialIndex >= Materials.Count)
+                {
+                    PreviewMaterialIndex = Materials.Count - 1;
+                }
+                if (_config.appliedMaterialIndex >= Materials.Count)
+                {
+                    IsApplied = false;
+                    _config.appliedMaterialIndex = -1;
+                }
             }
 
             public void HandleMaterialDrop(Object[] objects)
@@ -549,8 +594,19 @@ namespace Yueby
 
             public void SwitchMaterial(int direction)
             {
-                CurrentMaterialIndex = Mathf.Clamp(CurrentMaterialIndex + direction, 0, Materials.Count - 1);
-                PreviewMaterial();
+                if (!IsPreviewMode || Materials.Count == 0) return;
+                
+                // 如果当前预览索引无效，从0开始
+                if (_previewMaterialIndex < 0)
+                {
+                    _previewMaterialIndex = 0;
+                }
+                
+                PreviewMaterialIndex = Mathf.Clamp(
+                    PreviewMaterialIndex + direction, 
+                    0, 
+                    Materials.Count - 1
+                );
             }
 
             public void PreviewMaterial()
@@ -558,7 +614,7 @@ namespace Yueby
                 if (!IsPreviewMode || Renderer == null || Materials.Count == 0) return;
 
                 var materials = Renderer.sharedMaterials;
-                materials[SelectedMaterialIndex] = Materials[CurrentMaterialIndex];
+                materials[SelectedMaterialIndex] = Materials[PreviewMaterialIndex];
                 Renderer.sharedMaterials = materials;
             }
 
@@ -574,13 +630,16 @@ namespace Yueby
                 }
                 
                 // 保存当前应用的材质和索引
-                AppliedMaterial = Materials[CurrentMaterialIndex];
-                _config.currentMaterialIndex = CurrentMaterialIndex;
+                AppliedMaterial = Materials[PreviewMaterialIndex];
+                AppliedMaterialIndex = PreviewMaterialIndex; // 使用属性
                 
-                // 应用当前预览的材质
+                // 更新当前材质
                 var materials = Renderer.sharedMaterials;
                 materials[SelectedMaterialIndex] = AppliedMaterial;
                 Renderer.sharedMaterials = materials;
+                
+                // 更新原始材质为新应用的材质
+                OriginalMaterial = AppliedMaterial;
                 
                 // 标记为已应用
                 IsApplied = true;
@@ -590,6 +649,20 @@ namespace Yueby
                 if (_component != null)
                 {
                     EditorUtility.SetDirty(_component);
+                }
+            }
+
+            public void ResetToOriginal()
+            {
+                if (!IsPreviewMode) return;
+                
+                IsPreviewMode = false;
+                PreviewMaterialIndex = -1;
+                if (!IsApplied)
+                {
+                    var materials = Renderer.sharedMaterials;
+                    materials[SelectedMaterialIndex] = OriginalMaterial;
+                    Renderer.sharedMaterials = materials;
                 }
             }
         }

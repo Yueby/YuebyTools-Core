@@ -16,7 +16,7 @@ namespace Yueby
             public string rendererPath;
             public string name;
             public int selectedMaterialIndex;
-            public int currentMaterialIndex;
+            public int appliedMaterialIndex = -1;
             public List<Material> materials = new List<Material>();
             public bool isFoldout = true;
         }
