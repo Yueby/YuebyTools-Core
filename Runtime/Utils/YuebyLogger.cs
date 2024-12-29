@@ -31,7 +31,6 @@ namespace Yueby.Core.Utils
             { "Exception", new LogLevelColors("#d46ae6", "#e1bee7") },
         };
 
-
         private static string FormatMessage(string logLevel, params object[] messages)
         {
             var colors = GetColors(logLevel);
