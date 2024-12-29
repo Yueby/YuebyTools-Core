@@ -13,6 +13,13 @@ namespace Yueby.ModalWindow
 
         public T Data { get; protected set; }
 
+        protected ModalEditorWindow window;
+
+        public void SetWindow(ModalEditorWindow window)
+        {
+            this.window = window;
+        }
+
         public virtual void OnEnable()
         {
         }
@@ -23,6 +30,11 @@ namespace Yueby.ModalWindow
 
         public virtual void OnDraw()
         {
+        }
+
+        protected void Close()
+        {
+            window?.Close();
         }
     }
 }

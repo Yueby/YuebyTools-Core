@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
-using Logger = Yueby.Core.Utils.Logger;
+using Yueby.Core.Utils;
 
 public static class AssetsUtil
 {
@@ -44,12 +44,12 @@ public static class AssetsUtil
 
         var path = Application.dataPath.Replace("Assets", "") + AssetDatabase.GetAssetPath(Selection.activeObject);
         System.Diagnostics.Process.Start(path);
-        Logger.LogInfo($"Opening folder: {path}");
+        YuebyLogger.LogInfo($"Opening folder: {path}");
     }
 
     private static void CopyToClipboard(string content, string description)
     {
         EditorGUIUtility.systemCopyBuffer = content;
-        Logger.LogInfo($"Copied {description}: {content}");
+        YuebyLogger.LogInfo($"Copied {description}: {content}");
     }
 }

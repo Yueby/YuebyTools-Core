@@ -3,7 +3,6 @@ using UnityEditor;
 using UnityEngine;
 using Yueby.Core.Utils;
 using Yueby.Utils;
-using Logger = Yueby.Core.Utils.Logger;
 namespace Yueby
 {
     public class MaterialGeneratorEditorWindow : EditorWindow
@@ -243,7 +242,6 @@ namespace Yueby
         private void HandleDroppedObjects(Object[] objects)
         {
             if (objects == null) return;
-            // Logger.LogInfo("HandleDroppedObjects", objects);
 
             foreach (var obj in objects)
             {

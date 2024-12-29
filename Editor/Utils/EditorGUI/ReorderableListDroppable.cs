@@ -73,7 +73,10 @@ namespace Yueby.Utils
                 onRemoveCallback = reorderableList =>
                 {
                     OnRemoveBefore?.Invoke(reorderableList.index);
-                    elements.RemoveAt(reorderableList.index);
+                    if (reorderableList.index >= 0 && reorderableList.index < elements.Count)
+                    {
+                        elements.RemoveAt(reorderableList.index);
+                    }
                     OnRemove?.Invoke(reorderableList);
                     if (reorderableList.count > 0 && reorderableList.index != 0)
                         reorderableList.index--;
@@ -338,7 +341,7 @@ namespace Yueby.Utils
         public void RefreshElementHeights()
         {
             if (_elements == null) return;
-            
+
             Array.Resize(ref ElementHeights, _elements.Count);
             for (int i = 0; i < _elements.Count; i++)
             {

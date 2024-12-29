@@ -88,6 +88,7 @@ namespace Yueby.ModalWindow
         )
         {
             _drawer = drawer;
+            _drawer.SetWindow(this);
             _onOk = onOk;
             _onReturnValue = null;
             _ok = ok;
@@ -106,6 +107,7 @@ namespace Yueby.ModalWindow
         )
         {
             _drawer = drawer;
+            _drawer.SetWindow(this);
             _onOk = null;
             _onReturnValue = result;
             _ok = ok;
@@ -125,6 +127,7 @@ namespace Yueby.ModalWindow
         )
         {
             _drawer = drawer;
+            _drawer.SetWindow(this);
             _onOk = onOk;
             _onReturnValue = null;
             _ok = ok;
@@ -144,6 +147,7 @@ namespace Yueby.ModalWindow
         )
         {
             _drawer = drawer;
+            _drawer.SetWindow(this);
             _onOk = null;
             _onReturnValue = result;
             _ok = ok;
@@ -204,7 +208,7 @@ namespace Yueby.ModalWindow
         {
             var size = new Vector2(
                 _drawer.Position.width,
-                _drawer.Position.height + EditorGUIUtility.singleLineHeight + 2f
+                _drawer.Position.height + (IsHideCancel ? EditorGUIUtility.singleLineHeight : EditorGUIUtility.singleLineHeight + 2f)
             );
             window.minSize = size;
             window.maxSize = size;
@@ -216,7 +220,6 @@ namespace Yueby.ModalWindow
                 size.y
             );
 
-            // Debug.Log(rect);
             window.position = rect;
         }
 
@@ -224,7 +227,7 @@ namespace Yueby.ModalWindow
         {
             var size = new Vector2(
                 _drawer.Position.width,
-                _drawer.Position.height + EditorGUIUtility.singleLineHeight + 2f
+                _drawer.Position.height + (IsHideCancel ? EditorGUIUtility.singleLineHeight : EditorGUIUtility.singleLineHeight + 2f)
             );
             window.minSize = size;
             window.maxSize = size;
@@ -235,7 +238,6 @@ namespace Yueby.ModalWindow
                 size.x,
                 size.y
             );
-            // Debug.Log(rect);
 
             window.position = rect;
         }
@@ -248,27 +250,27 @@ namespace Yueby.ModalWindow
                 return;
             }
 
+            // 创建内容区域
+            GUILayout.BeginArea(new Rect(0, 0, position.width, _drawer.Position.height));
             _drawer.OnDraw();
+            GUILayout.EndArea();
 
-            var bottomRect = new Rect(0, position.height - EditorGUIUtility.singleLineHeight, position.width, EditorGUIUtility.singleLineHeight);
+            // 按钮区域在内容区域下方
+            var bottomRect = new Rect(0, _drawer.Position.height, position.width, EditorGUIUtility.singleLineHeight);
             var okRect = new Rect(bottomRect.x, bottomRect.y, IsHideCancel ? bottomRect.width : bottomRect.width / 2, bottomRect.height);
             var cancelRect = new Rect(okRect.x + okRect.width, bottomRect.y, bottomRect.width / 2, bottomRect.height);
 
             if (GUI.Button(okRect, _ok))
             {
                 Close();
-
                 _onOk?.Invoke();
                 _onReturnValue?.Invoke(true);
-                // EditorUtils.WaitToDo(1, "Wait to Exit GUI", GUIUtility.ExitGUI);
             }
 
             if (!IsHideCancel && GUI.Button(cancelRect, _cancel))
             {
                 Close();
                 _onReturnValue?.Invoke(false);
-
-                // EditorUtils.WaitToDo(1, "Wait to Exit GUI", GUIUtility.ExitGUI);
             }
         }
     }
@@ -284,9 +286,9 @@ namespace Yueby.ModalWindow
         string Title { get; }
         Rect Position { get; }
 
+        void SetWindow(ModalEditorWindow window);
         void OnEnable();
         void OnDisable();
-
         void OnDraw();
     }
 }
