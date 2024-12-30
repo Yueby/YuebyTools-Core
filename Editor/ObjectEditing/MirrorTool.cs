@@ -16,14 +16,17 @@ namespace Yueby
         private static GameObject currentSelectedObject;
         private static bool isWindowVisible = false;
         private static Vector2 windowPosition;
-        private static readonly Vector2 windowSize = new Vector2(150, 240);
         private static Rect windowRect;
         private static readonly string configPath;
         private static readonly string enableKey = "MirrorTool_Enabled";
         private static bool isEnabled;
         private static bool showMirrorAxis = true;
-        private static readonly Color themeColor = new Color(1f, 0.92f, 0.016f, 0.5f);
         private static PivotRotation lastPivotRotation;
+        private static bool isDetailWindowVisible = false;
+        private static Rect detailWindowRect;
+        private static readonly Vector2 mainWindowSize = new Vector2(120, 90);
+        private static readonly Vector2 detailWindowSize = new Vector2(200, 240);
+        private static bool needUpdateDetailPosition = false;
 
         // 公共访问器
         public static bool ShowMirrorAxis
@@ -97,7 +100,7 @@ namespace Yueby
         private static void BreakMirrorConnection(GameObject source, GameObject target)
         {
             if (source == null || target == null) return;
-            
+
             string sourcePath = GetObjectPath(source);
             string targetPath = GetObjectPath(target);
 
@@ -123,6 +126,7 @@ namespace Yueby
 
             SaveConfigs();
             SceneView.RepaintAll();
+            targetList?.RefreshElementHeights();
         }
 
         public static void EstablishMirrorConnection(GameObject source, GameObject target, Vector3 axis)
@@ -156,6 +160,7 @@ namespace Yueby
 
             SaveConfigs();
             SceneView.RepaintAll();
+            targetList?.RefreshElementHeights();
         }
 
         private static void OnSceneGUI(SceneView sceneView)
@@ -180,7 +185,7 @@ namespace Yueby
             {
                 currentSelectedObject = selectedObject;
                 windowPosition = new Vector2(10, 10);
-                windowRect = new Rect(windowPosition, windowSize);
+                windowRect = new Rect(windowPosition, mainWindowSize);
                 isWindowVisible = true;
 
                 // 初始化或更新目标列表
@@ -197,8 +202,21 @@ namespace Yueby
 
             Handles.BeginGUI();
 
+            // 绘制主窗口
             windowRect = GUILayout.Window(0, windowRect, DrawMirrorWindow, "Mirror Tool");
             windowPosition = windowRect.position;
+
+            // 更新并绘制详情窗口
+            if (isDetailWindowVisible)
+            {
+                if (needUpdateDetailPosition)
+                {
+                    float detailX = windowRect.x + windowRect.width + 5;
+                    detailWindowRect = new Rect(detailX, windowRect.y, detailWindowSize.x, detailWindowSize.y);
+                    needUpdateDetailPosition = false;
+                }
+                detailWindowRect = GUILayout.Window(1, detailWindowRect, DrawDetailWindow, "Mirror Details");
+            }
 
             Handles.EndGUI();
 
@@ -252,7 +270,7 @@ namespace Yueby
                 var targetPath = config.targetObjectPaths[index];
                 var targetObj = FindObjectByPath(targetPath);
                 var newTargetObj = EditorGUI.ObjectField(rect, targetObj, typeof(GameObject), true) as GameObject;
-                
+
                 if (newTargetObj != targetObj)
                 {
                     if (newTargetObj != null)
@@ -262,7 +280,7 @@ namespace Yueby
                         {
                             BreakMirrorConnection(currentSelectedObject, targetObj);
                         }
-                        
+
                         string newTargetPath = GetObjectPath(newTargetObj);
                         config.targetObjectPaths[index] = newTargetPath;
                         EstablishMirrorConnection(currentSelectedObject, newTargetObj, config.mirrorAxis);
@@ -283,12 +301,13 @@ namespace Yueby
             {
                 config.targetObjectPaths.Add("");
                 SaveConfigs();
+                targetList.RefreshElementHeights();
             };
 
             targetList.OnRemove = (list) =>
             {
-                // OnRemove不需要做额外操作，因为OnRemoveBefore已经处理了断开连接
                 SaveConfigs();
+                targetList.RefreshElementHeights();
             };
 
             targetList.OnRemoveBefore = (index) =>
@@ -303,26 +322,15 @@ namespace Yueby
                     }
                 }
             };
+
+            targetList.RefreshElementHeights();
         }
 
-        private static void DrawMirrorWindow(int id)
+        private static bool DrawCloseButton(Rect windowRect)
         {
-            if (currentSelectedObject == null) return;
-
-            // 根据主题选择合适的图标
-            string settingsIcon = EditorGUIUtility.isProSkin ? "d_Settings" : "Settings";
             string closeIcon = EditorGUIUtility.isProSkin ? "d_winbtn_win_close" : "winbtn_win_close";
-
             float iconSize = EditorGUIUtility.singleLineHeight;
-            float padding = 4;
-
-            // 在标题栏绘制按钮
-            Rect settingsRect = new Rect(
-                windowRect.width - iconSize * 2 - padding * 2,
-                padding,
-                iconSize,
-                iconSize
-            );
+            float padding = 2;
 
             Rect closeRect = new Rect(
                 windowRect.width - iconSize - padding,
@@ -331,37 +339,72 @@ namespace Yueby
                 iconSize
             );
 
-            GUIContent settingsContent = EditorGUIUtility.IconContent(settingsIcon);
-            if (GUI.Button(settingsRect, settingsContent, EditorStyles.iconButton))
-            {
-                var drawer = new MirrorToolSettingsDrawer();
-                ModalEditorWindow.ShowUtility(drawer);
-            }
-
             GUIContent closeContent = EditorGUIUtility.IconContent(closeIcon);
             if (GUI.Button(closeRect, closeContent, EditorStyles.iconButton))
             {
+                Event.current.Use();
+                return true;
+            }
+            return false;
+        }
+
+        private static void DrawMirrorWindow(int id)
+        {
+            if (currentSelectedObject == null) return;
+
+            string closeIcon = EditorGUIUtility.isProSkin ? "d_winbtn_win_close" : "winbtn_win_close";
+            float iconSize = EditorGUIUtility.singleLineHeight;
+            float padding = 2;
+
+            // 详情按钮 - 放在关闭按钮左边
+            string detailsIcon = isDetailWindowVisible ?
+                (EditorGUIUtility.isProSkin ? "d_Settings" : "Settings") :
+                (EditorGUIUtility.isProSkin ? "d_Settings" : "Settings");
+
+            GUIContent buttonContent = EditorGUIUtility.IconContent(detailsIcon);
+            buttonContent.tooltip = "Toggle Details";
+
+            Rect detailsButtonRect = new Rect(
+                padding,
+                padding,
+                iconSize,
+                iconSize
+            );
+
+            if (GUI.Button(detailsButtonRect, buttonContent, EditorStyles.iconButton))
+            {
+                isDetailWindowVisible = !isDetailWindowVisible;
+                if (isDetailWindowVisible)
+                {
+                    needUpdateDetailPosition = true;
+                }
+            }
+
+            // 关闭按钮
+            if (DrawCloseButton(windowRect))
+            {
                 isWindowVisible = false;
+                return;
             }
 
             EditorUI.VerticalEGL(() =>
             {
+                string sourcePath = GetObjectPath(currentSelectedObject);
+                if (!mirrorConfigs.ContainsKey(sourcePath))
+                {
+                    mirrorConfigs[sourcePath] = new MirrorConfig();
+                    InitializeTargetList(mirrorConfigs[sourcePath]);
+                }
+
+                MirrorConfig config = mirrorConfigs[sourcePath];
+
+                // 主窗口内容
                 EditorUI.VerticalEGL(new GUIStyle("Badge"), () =>
                 {
-                    string sourcePath = GetObjectPath(currentSelectedObject);
-                    if (!mirrorConfigs.ContainsKey(sourcePath))
-                    {
-                        mirrorConfigs[sourcePath] = new MirrorConfig();
-                        InitializeTargetList(mirrorConfigs[sourcePath]);
-                    }
-
-                    MirrorConfig config = mirrorConfigs[sourcePath];
-
-                    // 轴向选择
+                    // Axis 选择
                     EditorUI.HorizontalEGL(() =>
                     {
                         EditorGUILayout.LabelField("Axis", GUILayout.Width(45));
-
                         int selectedAxis = 0;
                         if (Vector3.Dot(config.mirrorAxis.normalized, Vector3.up) > 0.99f)
                             selectedAxis = 1;
@@ -374,55 +417,143 @@ namespace Yueby
                         {
                             switch (newSelection)
                             {
-                                case 0:
-                                    config.mirrorAxis = Vector3.right;
-                                    break;
-                                case 1:
-                                    config.mirrorAxis = Vector3.up;
-                                    break;
-                                case 2:
-                                    config.mirrorAxis = Vector3.forward;
-                                    break;
+                                case 0: config.mirrorAxis = Vector3.right; break;
+                                case 1: config.mirrorAxis = Vector3.up; break;
+                                case 2: config.mirrorAxis = Vector3.forward; break;
                             }
                         }
                     });
 
-                    EditorUI.DrawCheckChanged(
-                        () => config.mirrorAxis = EditorGUILayout.Vector3Field("Direction", config.mirrorAxis),
-                        () =>
-                        {
-                            foreach (var targetPath in config.targetObjectPaths)
-                            {
-                                var targetObj = FindObjectByPath(targetPath);
-                                if (targetObj != null)
-                                {
-                                    EstablishMirrorConnection(currentSelectedObject, targetObj, config.mirrorAxis);
-                                }
-                            }
-                        }
-                    );
-
-                    EditorGUILayout.Space(5);
-
-                    targetList?.DoLayout("Target Objects", new Vector2(0, 150), false, false, true, (objects) =>
+                    // 投放区域
+                    EditorUI.HorizontalEGL(() =>
                     {
-                        foreach (var obj in objects)
+                        Rect dropRect = EditorGUILayout.GetControlRect(GUILayout.Height(25), GUILayout.Width(mainWindowSize.x));
+                        EditorGUI.DrawRect(dropRect, new Color(0.2f, 0.2f, 0.2f, 0.3f));
+
+                        GUI.Label(dropRect, "Drop to here", new GUIStyle(EditorStyles.centeredGreyMiniLabel));
+
+                        // 添加数量badge
+                        int targetCount = config.targetObjectPaths.Count;
+                        if (targetCount > 0)
                         {
-                            if (obj is GameObject gameObj)
+                            GUIStyle badgeStyle = new GUIStyle(EditorStyles.miniLabel)
                             {
-                                string targetPath = GetObjectPath(gameObj);
-                                if (!config.targetObjectPaths.Contains(targetPath))
+                                alignment = TextAnchor.MiddleCenter,
+                                fontSize = 9
+                            };
+
+                            string badgeText = targetCount.ToString();
+                            Vector2 textSize = badgeStyle.CalcSize(new GUIContent(badgeText));
+
+                            float badgeSize = Mathf.Max(14, textSize.x + 6); // 最小14，文本两边各加3像素padding
+                            float badgeOffset = 4;
+
+                            Rect badgeRect = new Rect(
+                                dropRect.x + badgeOffset,
+                                dropRect.y + (dropRect.height - badgeSize) / 2,
+                                badgeSize,
+                                badgeSize
+                            );
+
+                            GUI.Box(badgeRect, "", "Badge");
+                            GUI.Label(badgeRect, badgeText, badgeStyle);
+                        }
+
+                        // 处理拖拽
+                        if (dropRect.Contains(Event.current.mousePosition))
+                        {
+                            if (Event.current.type == EventType.DragUpdated)
+                            {
+                                DragAndDrop.visualMode = DragAndDropVisualMode.Copy;
+                                Event.current.Use();
+                            }
+                            else if (Event.current.type == EventType.DragPerform)
+                            {
+                                DragAndDrop.AcceptDrag();
+                                foreach (var obj in DragAndDrop.objectReferences)
                                 {
-                                    config.targetObjectPaths.Add(targetPath);
-                                    EstablishMirrorConnection(currentSelectedObject, gameObj, config.mirrorAxis);
+                                    if (obj is GameObject gameObj)
+                                    {
+                                        string targetPath = GetObjectPath(gameObj);
+                                        if (!config.targetObjectPaths.Contains(targetPath))
+                                        {
+                                            config.targetObjectPaths.Add(targetPath);
+                                            EstablishMirrorConnection(currentSelectedObject, gameObj, config.mirrorAxis);
+                                        }
+                                    }
                                 }
+                                SaveConfigs();
+                                Event.current.Use();
                             }
                         }
-                        SaveConfigs();
                     });
                 });
             });
 
+            GUI.DragWindow();
+        }
+
+        private static void DrawDetailWindow(int id)
+        {
+            if (currentSelectedObject == null) return;
+
+            if (DrawCloseButton(detailWindowRect))
+            {
+                isDetailWindowVisible = false;
+                return;
+            }
+
+            string sourcePath = GetObjectPath(currentSelectedObject);
+
+            // 添加检查，如果配置不存在则创建新的
+            if (!mirrorConfigs.ContainsKey(sourcePath))
+            {
+                mirrorConfigs[sourcePath] = new MirrorConfig();
+                InitializeTargetList(mirrorConfigs[sourcePath]);
+            }
+
+            MirrorConfig config = mirrorConfigs[sourcePath];
+
+            EditorUI.VerticalEGL(() =>
+            {
+                // Direction 设置
+                EditorUI.DrawCheckChanged(
+                    () => config.mirrorAxis = EditorGUILayout.Vector3Field("Direction", config.mirrorAxis),
+                    () =>
+                    {
+                        foreach (var targetPath in config.targetObjectPaths)
+                        {
+                            var targetObj = FindObjectByPath(targetPath);
+                            if (targetObj != null)
+                            {
+                                EstablishMirrorConnection(currentSelectedObject, targetObj, config.mirrorAxis);
+                            }
+                        }
+                    }
+                );
+
+                EditorGUILayout.Space(5);
+
+                // 目标对象列表
+                targetList?.DoLayout("Target Objects", new Vector2(0, 150), false, false, true, (objects) =>
+                {
+                    foreach (var obj in objects)
+                    {
+                        if (obj is GameObject gameObj)
+                        {
+                            string targetPath = GetObjectPath(gameObj);
+                            if (!config.targetObjectPaths.Contains(targetPath))
+                            {
+                                config.targetObjectPaths.Add(targetPath);
+                                EstablishMirrorConnection(currentSelectedObject, gameObj, config.mirrorAxis);
+                            }
+                        }
+                    }
+                    SaveConfigs();
+                });
+            });
+
+            // 添加拖拽功能
             GUI.DragWindow();
         }
 
@@ -538,7 +669,7 @@ namespace Yueby
             var keysToRemove = mirrorConfigs.Where(kvp => kvp.Value.targetObjectPaths.Count == 0)
                                           .Select(kvp => kvp.Key)
                                           .ToList();
-            
+
             foreach (var key in keysToRemove)
             {
                 mirrorConfigs.Remove(key);
